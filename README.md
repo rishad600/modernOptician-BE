@@ -35,5 +35,12 @@ A scalable and modular Node.js backend using Express, Mongoose, and a Repository
 - `src/modules`: Domain-driven modular structure (User, Course).
 - `src/middlewares`: Global and custom middlewares.
 - `src/utils`: Reusable helper functions.
-- `src/constants`: Application-wide constants.
-- `src/routes`: API route definitions.
+- `src/constants`: Application-wide constants (HTTP status codes, error messages).
+- `src/routes`: API route definitions (v1 Routes).
+- `public`: Static assets.
+- `tests`: Automated tests.
+- `docs`: API documentation.
+
+## API Versioning
+
+The API is versioned. Current base URL: `/api/v1`
