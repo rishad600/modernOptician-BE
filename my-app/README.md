@@ -1,4 +1,4 @@
-# Professional Node.js Project
+# Node.js Project
 
 A scalable and modular Node.js backend using Express, Mongoose, and a Repository-Service-Controller pattern.
 
