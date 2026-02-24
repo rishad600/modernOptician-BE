@@ -4,7 +4,14 @@ import config from '../../config/config.js';
 
 class UserService {
     async register(userData) {
-        return await userRepository.create(userData);
+        const user = await userRepository.create(userData);
+        const token = this.generateToken(user._id);
+
+        // Save the active token to enforce single login
+        user.activeToken = token;
+        await user.save();
+
+        return { user, token };
     }
 
     async login(email, password) {

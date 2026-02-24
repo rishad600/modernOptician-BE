@@ -25,7 +25,7 @@ class UserRepository {
     }
 
     async findAll() {
-        return await User.find({ isTrash: false });
+        return await User.find({ isTrash: false }, { __v: 0 });
     }
 }
 

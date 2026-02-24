@@ -4,7 +4,7 @@ import asyncHandler from '../../utils/asyncHandler.js';
 
 export const createCourse = asyncHandler(async (req, res, next) => {
     const course = await courseService.createCourse(req.body);
-    res.status(201).json(Response.success('Course created successfully', course, 201));
+    res.status(201).json(Response.success('Course created successfully', null, 201));
 });
 
 export const getCourses = asyncHandler(async (req, res, next) => {
