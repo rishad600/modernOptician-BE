@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import connectDB from './config/database.js';
 import errorHandler from './middlewares/error.middleware.js';
-import v1Routes from './routes/v1.routes.js';
+import routes from './routes/routes.js';
 import config from './config/config.js';
 
 const app = express();
@@ -27,7 +27,7 @@ if (config.env === 'development') {
 }
 
 // Routes
-app.use('/web/v1', v1Routes);
+app.use('/web', routes);
 
 // Health check
 app.get('/health', (req, res) => {
