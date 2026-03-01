@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const adminSchema = new mongoose.Schema(
+const { Schema } = mongoose;
+
+const adminSchema = new Schema(
     {
         name: {
             type: String,
@@ -31,6 +33,19 @@ const adminSchema = new mongoose.Schema(
             type: String,
             default: null,
         },
+        avatar: { type: String, default: null },
+        isSuperAdmin: { type: Boolean, default: false },
+        lastActiveAt: { type: Date, default: null },
+        createdBy: {
+            type: Schema.Types.ObjectId,
+            ref: "Admin",
+            default: null,
+        },
+        updatedBy: {
+            type: Schema.Types.ObjectId,
+            ref: "Admin",
+            default: null,
+        }
     },
     {
         timestamps: true, // Includes createdAt and updatedAt

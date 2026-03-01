@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const userSchema = new mongoose.Schema(
+const { Schema } = mongoose;
+
+const userSchema = new Schema(
     {
         name: {
             type: String,
@@ -31,6 +33,14 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: null,
         },
+        avatar: { type: String, default: null },
+        isActive: { type: Boolean, default: true },
+        enrolledCourses: [
+            {
+                courseId: { type: Schema.Types.ObjectId, ref: "Course" },
+                enrolledAt: { type: Date, default: Date.now },
+            },
+        ],
     },
     {
         timestamps: true, // Includes createdAt and updatedAt
