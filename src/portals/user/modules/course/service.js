@@ -1,29 +1,29 @@
-export const makeCourseService = ({ courseRepository }) => {
-    const createCourse = async (courseData) => {
-        return await courseRepository.create(courseData);
-    };
+import courseRepository from './repository.js';
 
-    const getAllCourses = async () => {
-        return await courseRepository.findAll();
-    };
+const createCourse = async (courseData) => {
+    return await courseRepository.create(courseData);
+};
 
-    const getCourseById = async (id) => {
-        return await courseRepository.findById(id);
-    };
+const getAllCourses = async () => {
+    return await courseRepository.findAll();
+};
 
-    const updateCourse = async (id, updateData) => {
-        return await courseRepository.update(id, updateData);
-    };
+const getCourseById = async (id) => {
+    return await courseRepository.findById(id);
+};
 
-    const deleteCourse = async (id) => {
-        return await courseRepository.remove(id); // Changed to 'remove' to match new repository
-    };
+const updateCourse = async (id, updateData) => {
+    return await courseRepository.update(id, updateData);
+};
 
-    return Object.freeze({
-        createCourse,
-        getAllCourses,
-        getCourseById,
-        updateCourse,
-        deleteCourse,
-    });
+const deleteCourse = async (id) => {
+    return await courseRepository.remove(id); // Changed to 'remove' to match new repository
+};
+
+export default {
+    createCourse,
+    getAllCourses,
+    getCourseById,
+    updateCourse,
+    deleteCourse,
 };

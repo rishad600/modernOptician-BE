@@ -1,17 +1,19 @@
-export const makeAdminController = ({ adminService, asyncHandler, Response }) => {
-    const register = asyncHandler(async (req, res, next) => {
-        const { admin, token } = await adminService.register(req.body);
-        res.status(201).json(Response.success('Successfully created', { admin, token }, 201));
-    });
+import adminService from './service.js';
+import asyncHandler from '../../../../utils/asyncHandler.js';
+import Response from '../../../../utils/response.js';
 
-    const login = asyncHandler(async (req, res, next) => {
-        const { email, password } = req.body;
-        const { admin, token } = await adminService.login(email, password);
-        res.json(Response.success('Admin logged in successfully', { admin, token }));
-    });
+const register = asyncHandler(async (req, res, next) => {
+    const { admin, token } = await adminService.register(req.body);
+    res.status(201).json(Response.success('Successfully created', { admin, token }, 201));
+});
 
-    return Object.freeze({
-        register,
-        login,
-    });
+const login = asyncHandler(async (req, res, next) => {
+    const { email, password } = req.body;
+    const { admin, token } = await adminService.login(email, password);
+    res.json(Response.success('Admin logged in successfully', { admin, token }));
+});
+
+export default {
+    register,
+    login,
 };

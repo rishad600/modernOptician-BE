@@ -1,47 +1,49 @@
-export const makeUserService = ({ userRepository, config, jwt }) => {
-    const register = async (userData) => {
-        const user = await userRepository.create(userData);
-        const token = generateToken(user._id);
+import userRepository from './repository.js';
+import config from '../../../../config/config.js';
+import jwt from 'jsonwebtoken';
 
-        user.activeToken = token;
-        await user.save();
+const register = async (userData) => {
+    const user = await userRepository.create(userData);
+    const token = generateToken(user._id);
 
-        return { user, token };
-    };
+    user.activeToken = token;
+    await user.save();
 
-    const login = async (email, password) => {
-        const user = await userRepository.findByEmail(email);
+    return { user, token };
+};
 
-        if (!user || !(await user.matchPassword(password))) {
-            throw new Error('Invalid credentials');
-        }
+const login = async (email, password) => {
+    const user = await userRepository.findByEmail(email);
 
-        const token = generateToken(user._id);
+    if (!user || !(await user.matchPassword(password))) {
+        throw new Error('Invalid credentials');
+    }
 
-        user.activeToken = token;
-        await user.save();
+    const token = generateToken(user._id);
 
-        return { user, token };
-    };
+    user.activeToken = token;
+    await user.save();
 
-    const getAllUsers = async () => {
-        return await userRepository.findAll();
-    };
+    return { user, token };
+};
 
-    const getUserById = async (id) => {
-        return await userRepository.findById(id);
-    };
+const getAllUsers = async () => {
+    return await userRepository.findAll();
+};
 
-    const generateToken = (id) => {
-        return jwt.sign({ id }, config.jwt.secret, {
-            expiresIn: config.jwt.accessExpirationMinutes,
-        });
-    };
+const getUserById = async (id) => {
+    return await userRepository.findById(id);
+};
 
-    return Object.freeze({
-        register,
-        login,
-        getAllUsers,
-        getUserById,
+const generateToken = (id) => {
+    return jwt.sign({ id }, config.jwt.secret, {
+        expiresIn: config.jwt.accessExpirationMinutes,
     });
+};
+
+export default {
+    register,
+    login,
+    getAllUsers,
+    getUserById,
 };

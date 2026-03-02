@@ -1,14 +1,14 @@
-export const makeAdminRepository = ({ Admin }) => {
-    const create = async (adminData) => {
-        return await Admin.create(adminData);
-    };
+import Admin from '../../../../models/admin.model.js';
 
-    const findByEmail = async (email) => {
-        return await Admin.findOne({ email }).select('+password');
-    };
+const create = async (adminData) => {
+    return await Admin.create(adminData);
+};
 
-    return Object.freeze({
-        create,
-        findByEmail,
-    });
+const findByEmail = async (email) => {
+    return await Admin.findOne({ email }).select('+password');
+};
+
+export default {
+    create,
+    findByEmail,
 };

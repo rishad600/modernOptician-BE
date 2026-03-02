@@ -1,37 +1,39 @@
-export const makeAdminService = ({ adminRepository, config, jwt }) => {
-    const register = async (adminData) => {
-        const admin = await adminRepository.create(adminData);
-        const token = generateToken(admin._id);
+import adminRepository from './repository.js';
+import config from '../../../../config/config.js';
+import jwt from 'jsonwebtoken';
 
-        admin.activeToken = token;
-        await admin.save();
+const register = async (adminData) => {
+    const admin = await adminRepository.create(adminData);
+    const token = generateToken(admin._id);
 
-        return { admin, token };
-    };
+    admin.activeToken = token;
+    await admin.save();
 
-    const login = async (email, password) => {
-        const admin = await adminRepository.findByEmail(email);
+    return { admin, token };
+};
 
-        if (!admin || !(await admin.matchPassword(password))) {
-            throw new Error('Invalid credentials');
-        }
+const login = async (email, password) => {
+    const admin = await adminRepository.findByEmail(email);
 
-        const token = generateToken(admin._id);
+    if (!admin || !(await admin.matchPassword(password))) {
+        throw new Error('Invalid credentials');
+    }
 
-        admin.activeToken = token;
-        await admin.save();
+    const token = generateToken(admin._id);
 
-        return { admin, token };
-    };
+    admin.activeToken = token;
+    await admin.save();
 
-    const generateToken = (id) => {
-        return jwt.sign({ id }, config.jwt.secret, {
-            expiresIn: config.jwt.accessExpirationMinutes,
-        });
-    };
+    return { admin, token };
+};
 
-    return Object.freeze({
-        register,
-        login,
+const generateToken = (id) => {
+    return jwt.sign({ id }, config.jwt.secret, {
+        expiresIn: config.jwt.accessExpirationMinutes,
     });
+};
+
+export default {
+    register,
+    login,
 };
