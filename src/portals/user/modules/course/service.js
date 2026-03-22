@@ -4,8 +4,8 @@ const createCourse = async (courseData) => {
     return await courseRepository.create(courseData);
 };
 
-const getAllCourses = async () => {
-    return await courseRepository.findAll();
+const getAllCourses = async (studentId) => {
+    return await courseRepository.findAllEnrolled(studentId);
 };
 
 const getCourseById = async (id) => {

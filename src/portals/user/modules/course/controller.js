@@ -8,7 +8,8 @@ const createCourse = asyncHandler(async (req, res, next) => {
 });
 
 const getCourses = asyncHandler(async (req, res, next) => {
-    const courses = await courseService.getAllCourses();
+    const studentId = req.user._id;
+    const courses = await courseService.getAllCourses(studentId);
     res.json(Response.success('Courses fetched successfully', courses));
 });
 
