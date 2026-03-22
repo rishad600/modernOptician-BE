@@ -1,9 +1,5 @@
 import courseRepository from './repository.js';
 
-const createCourse = async (courseData) => {
-    return await courseRepository.create(courseData);
-};
-
 const getAllCourses = async (studentId) => {
     return await courseRepository.findAllEnrolled(studentId);
 };
@@ -21,7 +17,6 @@ const deleteCourse = async (id) => {
 };
 
 export default {
-    createCourse,
     getAllCourses,
     getCourseById,
     updateCourse,

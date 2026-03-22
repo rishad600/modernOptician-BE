@@ -2,11 +2,6 @@ import courseService from './service.js';
 import asyncHandler from '../../../../utils/asyncHandler.js';
 import Response from '../../../../utils/response.js';
 
-const createCourse = asyncHandler(async (req, res, next) => {
-    const course = await courseService.createCourse(req.body);
-    res.status(201).json(Response.success('Course created successfully', null, 201));
-});
-
 const getCourses = asyncHandler(async (req, res, next) => {
     const studentId = req.user._id;
     const courses = await courseService.getAllCourses(studentId);
@@ -22,7 +17,6 @@ const getCourse = asyncHandler(async (req, res, next) => {
 });
 
 export default {
-    createCourse,
     getCourses,
     getCourse,
 };

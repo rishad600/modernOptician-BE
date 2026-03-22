@@ -1,9 +1,5 @@
 import Course from '../../../../models/course.model.js';
 
-const create = async (courseData) => {
-    return await Course.create(courseData);
-};
-
 const findById = async (id) => {
     return await Course.findById(id);
 };
@@ -36,7 +32,6 @@ const findAllEnrolled = async (studentId) => {
 };
 
 export default {
-    create,
     findById,
     update,
     remove,
