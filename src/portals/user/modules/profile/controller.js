@@ -18,8 +18,18 @@ const getUsers = asyncHandler(async (req, res, next) => {
     res.json(Response.success('Users fetched successfully', users));
 });
 
+const changePassword = asyncHandler(async (req, res, next) => {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.user._id;
+
+    await userService.changePassword(userId, oldPassword, newPassword);
+
+    res.json(Response.success('Password changed successfully'));
+});
+
 export default {
     register,
     login,
     getUsers,
+    changePassword,
 };

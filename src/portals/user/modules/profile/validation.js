@@ -11,7 +11,13 @@ const login = Joi.object({
     password: Joi.string().required(),
 });
 
+const changePassword = Joi.object({
+    oldPassword: Joi.string().required(),
+    newPassword: Joi.string().min(6).required(),
+});
+
 export default {
     register,
     login,
+    changePassword,
 };

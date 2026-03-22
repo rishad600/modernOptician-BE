@@ -27,6 +27,10 @@ const findAll = async () => {
     return await User.find({ isTrash: false }, { __v: 0 });
 };
 
+const findByIdWithPassword = async (id) => {
+    return await User.findById(id).select('+password');
+};
+
 export default {
     create,
     findByEmail,
@@ -34,4 +38,5 @@ export default {
     update,
     remove,
     findAll,
+    findByIdWithPassword,
 };
