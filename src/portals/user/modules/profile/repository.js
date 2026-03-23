@@ -31,6 +31,10 @@ const findByIdWithPassword = async (id) => {
     return await User.findById(id).select('+password');
 };
 
+const findByEmailWithOtp = async (email) => {
+    return await User.findOne({ email }).select('+resetPasswordOtp +resetPasswordExpires');
+};
+
 export default {
     create,
     findByEmail,
@@ -39,4 +43,5 @@ export default {
     remove,
     findAll,
     findByIdWithPassword,
+    findByEmailWithOtp,
 };

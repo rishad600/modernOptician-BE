@@ -27,9 +27,22 @@ const changePassword = asyncHandler(async (req, res, next) => {
     res.json(Response.success('Password changed successfully'));
 });
 
+const forgotPassword = asyncHandler(async (req, res, next) => {
+    await userService.forgotPassword(req.body.email);
+    res.json(Response.success('OTP sent to email'));
+});
+
+const resetPassword = asyncHandler(async (req, res, next) => {
+    const { email, otp, newPassword } = req.body;
+    await userService.resetPassword(email, otp, newPassword);
+    res.json(Response.success('Password reset successfully'));
+});
+
 export default {
     register,
     login,
     getUsers,
     changePassword,
+    forgotPassword,
+    resetPassword,
 };

@@ -33,6 +33,14 @@ const userSchema = new Schema(
             type: String,
             default: null,
         },
+        resetPasswordOtp: {
+            type: String,
+            default: null,
+        },
+        resetPasswordExpires: {
+            type: Date,
+            default: null,
+        },
         avatar: { type: String, default: null },
         isActive: { type: Boolean, default: true },
         enrolledCourses: [
