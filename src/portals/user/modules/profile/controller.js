@@ -13,9 +13,10 @@ const login = asyncHandler(async (req, res, next) => {
     res.json(Response.success('User logged in successfully', { user, token }));
 });
 
-const getUsers = asyncHandler(async (req, res, next) => {
-    const users = await userService.getAllUsers();
-    res.json(Response.success('Users fetched successfully', users));
+const getProfile = asyncHandler(async (req, res, next) => {
+    const userId = req.user._id;
+    const user = await userService.getUserById(userId);
+    res.json(Response.success('Profile fetched successfully', user));
 });
 
 const changePassword = asyncHandler(async (req, res, next) => {
@@ -41,7 +42,7 @@ const resetPassword = asyncHandler(async (req, res, next) => {
 export default {
     register,
     login,
-    getUsers,
+    getProfile,
     changePassword,
     forgotPassword,
     resetPassword,

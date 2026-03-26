@@ -9,7 +9,7 @@ const findByEmail = async (email) => {
 };
 
 const findById = async (id) => {
-    return await User.findById(id);
+    return await User.findById(id).select('-resetPasswordOtp -resetPasswordExpires -activeToken -__v');
 };
 
 const update = async (id, updateData) => {
