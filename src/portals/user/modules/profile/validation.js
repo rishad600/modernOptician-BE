@@ -26,10 +26,17 @@ const resetPassword = Joi.object({
     newPassword: Joi.string().min(6).required(),
 });
 
+const updateProfile = Joi.object({
+    name: Joi.string().optional(),
+    lastName: Joi.string().optional(),
+    phone: Joi.string().optional(),
+});
+
 export default {
     register,
     login,
     changePassword,
     forgotPassword,
     resetPassword,
+    updateProfile,
 };

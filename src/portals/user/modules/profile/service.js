@@ -140,6 +140,10 @@ const generateToken = (id) => {
     });
 };
 
+const updateProfile = async (userId, updateData) => {
+    return await userRepository.update(userId, updateData);
+};
+
 export default {
     register,
     login,
@@ -148,4 +152,5 @@ export default {
     changePassword,
     forgotPassword,
     resetPassword,
+    updateProfile,
 };

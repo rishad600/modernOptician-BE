@@ -39,6 +39,20 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     res.json(Response.success('Password reset successfully'));
 });
 
+const updateProfile = asyncHandler(async (req, res, next) => {
+    const userId = req.user._id;
+    const { name, lastName, phone } = req.body;
+    
+    // Only pass defined fields to avoid completely removing others if they aren't part of the request
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (lastName !== undefined) updateData.lastName = lastName;
+    if (phone !== undefined) updateData.phone = phone;
+
+    await userService.updateProfile(userId, updateData);
+    res.json(Response.success('Profile updated successfully'));
+});
+
 export default {
     register,
     login,
@@ -46,4 +60,5 @@ export default {
     changePassword,
     forgotPassword,
     resetPassword,
+    updateProfile,
 };
