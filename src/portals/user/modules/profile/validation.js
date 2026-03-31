@@ -12,7 +12,7 @@ const login = Joi.object({
 });
 
 const changePassword = Joi.object({
-    oldPassword: Joi.string().required(),
+    currentPassword: Joi.string().required(),
     newPassword: Joi.string().min(6).required(),
 });
 

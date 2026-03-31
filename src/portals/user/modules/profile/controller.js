@@ -20,10 +20,10 @@ const getProfile = asyncHandler(async (req, res, next) => {
 });
 
 const changePassword = asyncHandler(async (req, res, next) => {
-    const { oldPassword, newPassword } = req.body;
+    const { currentPassword, newPassword } = req.body;
     const userId = req.user._id;
 
-    await userService.changePassword(userId, oldPassword, newPassword);
+    await userService.changePassword(userId, currentPassword, newPassword);
 
     res.json(Response.success('Password changed successfully'));
 });

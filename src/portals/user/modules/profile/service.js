@@ -38,8 +38,8 @@ const getUserById = async (id) => {
     return await userRepository.findById(id);
 };
 
-const changePassword = async (userId, oldPassword, newPassword) => {
-    if (oldPassword === newPassword) {
+const changePassword = async (userId, currentPassword, newPassword) => {
+    if (currentPassword === newPassword) {
         const err = new Error('Your new password must be different from your current password');
         err.code = 400;
         throw err;
@@ -53,8 +53,8 @@ const changePassword = async (userId, oldPassword, newPassword) => {
         throw err;
     }
 
-    if (!(await user.matchPassword(oldPassword))) {
-        const err = new Error('Password is incorrect');
+    if (!(await user.matchPassword(currentPassword))) {
+        const err = new Error('The current password you entered is incorrect. Please try again.');
         err.code = 400;
         throw err;
     }
