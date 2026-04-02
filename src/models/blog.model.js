@@ -21,18 +21,35 @@ const blogSchema = new Schema(
             type: String,
             required: [true, 'Please add a blog header image'],
         },
-        quote: {
+
+
+        tags: {
+            type: [String],
+            default: [],
+        },
+        contentType: {
+            type: String,
+            enum: ['Blog Post', 'Article'],
+            default: 'Blog Post',
+        },
+        excerpt: {
             type: String,
             default: '',
         },
-        category: {
-            type: [String], // E.g., ['TECHNOLOGY', 'AI', 'FUTURE']
-            default: [],
+        publishDate: {
+            type: Date,
+            default: Date.now,
         },
-        isPublished: {
-            type: Boolean,
-            default: false,
+        aboutAuthor: {
+            type: String,
+            default: '',
         },
+        status: {
+            type: String,
+            enum: ['Published', 'Draft'],
+            default: 'Draft',
+        },
+
         isTrash: {
             type: Boolean,
             default: false,

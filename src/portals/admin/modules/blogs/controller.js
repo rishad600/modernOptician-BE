@@ -7,9 +7,10 @@ const create = async (req, res, next) => {
         const blogDTO = blogDto.createBlogDTO(req.body, req.admin._id);
 
         const blog = await blogService.createBlog(blogDTO);
-        return res.status(201).json(Response.success('Blog created successfully', blog, 201));
+        const formattedBlog = blogDto.responseBlogDTO(blog);
+        return res.status(200).json(Response.success('Your article has been successfully saved.', formattedBlog, 200));
     } catch (error) {
-        return res.status(500).json(Response.error(error.message || 'Failed to create blog', 500));
+        return res.status(500).json(Response.error(error.message || 'We encountered an issue while saving your article. Please try again.', 500));
     }
 };
 
@@ -39,11 +40,12 @@ const update = async (req, res, next) => {
         const updateDTO = blogDto.updateBlogDTO(req.body, req.admin._id);
         const blog = await blogService.updateBlog(req.params.id, updateDTO);
         if (!blog) {
-            return res.status(404).json(Response.error('Blog not found', 404));
+            return res.status(404).json(Response.error('The requested article could not be found.', 404));
         }
-        return res.status(200).json(Response.success('Blog updated successfully', blog, 200));
+        const formattedBlog = blogDto.responseBlogDTO(blog);
+        return res.status(200).json(Response.success('Your article has been successfully updated.', formattedBlog, 200));
     } catch (error) {
-        return res.status(500).json(Response.error(error.message || 'Failed to update blog', 500));
+        return res.status(500).json(Response.error(error.message || 'We encountered an issue while updating your article. Please try again.', 500));
     }
 };
 

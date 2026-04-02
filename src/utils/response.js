@@ -3,7 +3,7 @@ const success = (message, data, statusCode = 200) => {
         success: true,
         message,
         code: statusCode,
-        data,
+        ...(data ? { data } : {}),
     };
 };
 
