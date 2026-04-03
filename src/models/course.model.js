@@ -24,7 +24,14 @@ const courseSchema = new Schema(
         },
         features: { type: [String], default: [] },
         totalDuration: { type: Number, default: 0 }, // in minutes  
-        isPublished: { type: Boolean, default: false },
+        instructorName: { type: String },
+        status: {
+            type: String,
+            enum: ['Published', 'Draft', 'Archived'],
+            default: 'Draft'
+        },
+        rating: { type: String, default: "0" },
+        lessons: { type: Number, default: 0 },
         createdBy: { type: Schema.Types.ObjectId, ref: "Admin", required: true },
         updatedBy: { type: Schema.Types.ObjectId, ref: "Admin", default: null },
     },

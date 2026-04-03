@@ -5,15 +5,13 @@ const createCourse = Joi.object({
         'string.empty': 'Please add a course name',
         'any.required': 'Please add a course name'
     }),
-    description: Joi.string().optional(),
-    thumbnail: Joi.string().uri().optional(),
+    description: Joi.string().required(),
+    thumbnail: Joi.string().uri().required(),
     price: Joi.number().min(0).required(),
-    currency: Joi.string().default('USD').optional(),
-    isTrash: Joi.boolean().default(false).optional(),
     category: Joi.string().valid("Optometry", "Retail Management", "Contact Lens", "Dispensing").required(),
     features: Joi.array().items(Joi.string()).default([]).optional(),
-    totalDuration: Joi.number().min(0).default(0).optional(),
-    isPublished: Joi.boolean().default(false).optional()
+    instructorName: Joi.string().required(),
+    status: Joi.string().valid('Published', 'Draft', 'Archived').default('Draft').required()
     // createdBy will be assigned via token/auth, not user input
 });
 
@@ -22,12 +20,10 @@ const updateCourse = Joi.object({
     description: Joi.string().optional(),
     thumbnail: Joi.string().uri().optional(),
     price: Joi.number().min(0).optional(),
-    currency: Joi.string().optional(),
-    isTrash: Joi.boolean().optional(),
     category: Joi.string().valid("Optometry", "Retail Management", "Contact Lens", "Dispensing").optional(),
     features: Joi.array().items(Joi.string()).optional(),
-    totalDuration: Joi.number().min(0).optional(),
-    isPublished: Joi.boolean().optional()
+    instructorName: Joi.string().optional(),
+    status: Joi.string().valid('Published', 'Draft', 'Archived').optional()
     // updatedBy will be assigned via token/auth, not user input
 });
 

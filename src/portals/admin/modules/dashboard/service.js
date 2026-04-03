@@ -12,7 +12,7 @@ const getDashboardData = async (filters = {}) => {
         if (filters.endDate) dateQuery.createdAt.$lte = filters.endDate;
     }
 
-    const courseQuery = { isTrash: false, isPublished: true, ...dateQuery };
+    const courseQuery = { isTrash: false, status: 'Published', ...dateQuery };
     if (filters.category) {
         courseQuery.category = filters.category;
     }
