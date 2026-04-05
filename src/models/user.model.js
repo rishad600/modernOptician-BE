@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import moment from 'moment-timezone';
+import config from '../config/config.js';
 
 const { Schema } = mongoose;
 
@@ -61,7 +63,7 @@ const userSchema = new Schema(
         enrolledCourses: [
             {
                 courseId: { type: Schema.Types.ObjectId, ref: "Course" },
-                enrolledAt: { type: Date, default: Date.now },
+                enrolledAt: { type: Date, default: () => moment.tz(config.timezone).toDate() },
                 isCompleted: { type: Boolean, default: false },
                 completedAt: { type: Date, default: null }
             },

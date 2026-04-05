@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import moment from 'moment-timezone';
+import config from '../config/config.js';
 
 const { Schema } = mongoose;
 
@@ -38,7 +40,7 @@ const blogSchema = new Schema(
         },
         publishDate: {
             type: Date,
-            default: Date.now,
+            default: () => moment.tz(config.timezone).toDate(),
         },
         aboutAuthor: {
             type: String,

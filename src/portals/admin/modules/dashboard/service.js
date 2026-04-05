@@ -6,7 +6,7 @@ import moment from 'moment-timezone';
 import config from '../../../../config/config.js';
 
 const getDashboardData = async (filters = {}) => {
-    const timezone = config.timezone || "Asia/Kolkata";
+    const timezone = config.timezone;
     // 1. Build Base Match Queries based on filters
     const dateQuery = {};
     if (filters.startDate || filters.endDate) {

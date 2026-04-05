@@ -8,20 +8,34 @@ const getUsersList = async (keyword, status, page = 1, limit = 20) => {
         const skip = (page - 1) * limit;
         let matchCondition = {};
 
-        if (keyword) {
-            matchCondition.$or = [
-                { name: { $regex: keyword, $options: "i" } },
-                { email: { $regex: keyword, $options: "i" } },
-                { studentId: { $regex: keyword, $options: "i" } }
-            ];
-        }
-
         if (status) {
             matchCondition.isTrash = status === 'Active' ? false : true;
         }
 
-        const result = await User.aggregate([
-            { $match: matchCondition },
+        const pipeline = [
+            { $match: matchCondition }
+        ];
+
+        if (keyword) {
+            pipeline.push({
+                $addFields: {
+                    fullName: {
+                        $concat: ["$name", " ", { $ifNull: ["$lastName", ""] }]
+                    }
+                }
+            });
+            pipeline.push({
+                $match: {
+                    $or: [
+                        { fullName: { $regex: keyword, $options: "i" } },
+                        { email: { $regex: keyword, $options: "i" } },
+                        { studentId: { $regex: keyword, $options: "i" } }
+                    ]
+                }
+            });
+        }
+
+        pipeline.push(
             {
                 $lookup: {
                     from: "enrollments",
@@ -55,7 +69,9 @@ const getUsersList = async (keyword, status, page = 1, limit = 20) => {
                     totalCount: [{ $count: "count" }]
                 }
             }
-        ]);
+        );
+
+        const result = await User.aggregate(pipeline);
 
         const users = result[0].users;
         const totalCount = result[0].totalCount[0]?.count || 0;
@@ -171,7 +187,7 @@ const deleteStudent = async (id) => {
 
 const getStats = async () => {
     try {
-        const timezone = config.timezone || "Asia/Kolkata";
+        const timezone = config.timezone;
         const now = moment.tz(timezone);
         const oneWeekAgo = now.clone().subtract(7, 'days').toDate();
         const twoWeeksAgo = now.clone().subtract(14, 'days').toDate();
