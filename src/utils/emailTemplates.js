@@ -1,3 +1,6 @@
+import moment from 'moment-timezone';
+import config from '../config/config.js';
+
 export const getForgotPasswordTemplate = (name, otp) => {
   const otpDigits = String(otp).split('').map(digit => `<div class="otp-digit">${digit}</div>`).join('');
 
@@ -105,7 +108,7 @@ export const getForgotPasswordTemplate = (name, otp) => {
         </div>
   
         <div class="email-footer">
-          <p>&copy; ${new Date().getFullYear()} Optician Online Class. All rights reserved.</p>
+          <p>&copy; ${moment.tz(config.timezone).year()} Optician Online Class. All rights reserved.</p>
         </div>
   
       </div>

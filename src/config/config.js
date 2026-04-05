@@ -14,4 +14,5 @@ export default {
     secret: process.env.JWT_SECRET,
     accessExpirationMinutes: process.env.JWT_EXPIRE || '24h',
   },
+  timezone: 'Asia/Kolkata',
 };

@@ -5,6 +5,11 @@ const { Schema } = mongoose;
 
 const userSchema = new Schema(
     {
+        studentId: {
+            type: String,
+            unique: true,
+            sparse: true // since existing users won't have it and might have null or undefined
+        },
         name: {
             type: String,
             required: [true, 'Please add a name'],
@@ -57,6 +62,8 @@ const userSchema = new Schema(
             {
                 courseId: { type: Schema.Types.ObjectId, ref: "Course" },
                 enrolledAt: { type: Date, default: Date.now },
+                isCompleted: { type: Boolean, default: false },
+                completedAt: { type: Date, default: null }
             },
         ],
     },

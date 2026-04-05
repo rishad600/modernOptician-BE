@@ -1,38 +1,78 @@
 import User from '../../../../models/user.model.js';
 
 const create = async (userData) => {
-    return await User.create(userData);
+    try {
+        return await User.create(userData);
+    } catch (error) {
+        throw error;
+    }
 };
 
 const findByEmail = async (email) => {
-    return await User.findOne({ email }).select('+password');
+    try {
+        return await User.findOne({ email }).select('+password');
+    } catch (error) {
+        throw error;
+    }
 };
 
 const findById = async (id) => {
-    return await User.findById(id).select('-resetPasswordOtp -resetPasswordExpires -activeToken -__v');
+    try {
+        return await User.findById(id).select('-resetPasswordOtp -resetPasswordExpires -activeToken -__v');
+    } catch (error) {
+        throw error;
+    }
 };
 
 const update = async (id, updateData) => {
-    return await User.findByIdAndUpdate(id, updateData, {
-        new: true,
-        runValidators: true,
-    });
+    try {
+        return await User.findByIdAndUpdate(id, updateData, {
+            new: true,
+            runValidators: true,
+        });
+    } catch (error) {
+        throw error;
+    }
 };
 
 const remove = async (id) => {
-    return await User.findByIdAndUpdate(id, { isTrash: true }, { new: true });
+    try {
+        return await User.findByIdAndUpdate(id, { isTrash: true }, { new: true });
+    } catch (error) {
+        throw error;
+    }
 };
 
 const findAll = async () => {
-    return await User.find({ isTrash: false }, { __v: 0 });
+    try {
+        return await User.find({ isTrash: false }, { __v: 0 });
+    } catch (error) {
+        throw error;
+    }
 };
 
 const findByIdWithPassword = async (id) => {
-    return await User.findById(id).select('+password');
+    try {
+        return await User.findById(id).select('+password');
+    } catch (error) {
+        throw error;
+    }
 };
 
 const findByEmailWithOtp = async (email) => {
-    return await User.findOne({ email }).select('+resetPasswordOtp +resetPasswordExpires');
+    try {
+        return await User.findOne({ email }).select('+resetPasswordOtp +resetPasswordExpires');
+    } catch (error) {
+        throw error;
+    }
+};
+
+const findByStudentId = async (studentId) => {
+    try {
+        return await User.findOne({ studentId });
+    } catch (error) {
+        throw error;
+    }
 };
 
 export default {
@@ -44,4 +84,5 @@ export default {
     findAll,
     findByIdWithPassword,
     findByEmailWithOtp,
+    findByStudentId,
 };
