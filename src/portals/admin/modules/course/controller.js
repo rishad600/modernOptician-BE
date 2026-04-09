@@ -59,10 +59,50 @@ const deleteCourse = async (req, res, next) => {
     }
 };
 
+const addLesson = async (req, res, next) => {
+    try {
+        const lesson = await courseService.createLesson(req.body);
+        return res.status(200).json(Response.success('Lesson created successfully', lesson, 200));
+    } catch (error) {
+        console.error('Add Lesson error:', error);
+        return res.status(500).json(Response.error(error.message || 'Failed to add lesson', 500));
+    }
+};
+
+const prepareVideoUpload = async (req, res, next) => {
+    try {
+        const { lessonId, courseId } = req.body;
+
+        const result = await courseService.prepareVideoUpload(lessonId, courseId);
+        return res.status(200).json(Response.success('Upload signature generated successfully', result, 200));
+    } catch (error) {
+        console.error('Video prep error:', error);
+        return res.status(error.status || 500).json(Response.error(error.message || 'Failed to prepare video upload', error.status || 500));
+    }
+};
+
+const playVideo = async (req, res, next) => {
+    try {
+        const { lessonId } = req.params;
+        const result = await courseService.getSignedPlayUrl(lessonId);
+
+        if (result.success === false) {
+            return res.status(result.status).json(Response.error(result.message, result.status));
+        }
+
+        return res.status(200).json(Response.success('Signed playback URL generated', result, 200));
+    } catch (error) {
+        return res.status(500).json(Response.error('Failed to generate playback URL', 500));
+    }
+};
+
 export default {
     create,
     getAll,
     getOne,
     update,
     deleteCourse,
+    prepareVideoUpload,
+    addLesson,
+    playVideo,
 };

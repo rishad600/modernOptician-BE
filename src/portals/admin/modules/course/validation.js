@@ -27,7 +27,30 @@ const updateCourse = Joi.object({
     // updatedBy will be assigned via token/auth, not user input
 });
 
+const prepareVideoUpload = Joi.object({
+    courseId: Joi.string().required(),
+    lessonId: Joi.string().required(),
+});
+
+const createLesson = Joi.object({
+    courseId: Joi.string().required(),
+    title: Joi.string().trim().required(),
+    description: Joi.string().required(),
+    order: Joi.number().required(),
+    isFreePreview: Joi.boolean().default(false),
+    duration: Joi.number().default(0),
+});
+
+const playVideo = Joi.object({
+    params: Joi.object({
+        lessonId: Joi.string().required(),
+    }),
+});
+
 export default {
     createCourse,
     updateCourse,
+    prepareVideoUpload,
+    createLesson,
+    playVideo,
 };

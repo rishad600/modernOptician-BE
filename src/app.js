@@ -13,7 +13,11 @@ const app = express();
 await connectDB();
 
 // Body parser
-app.use(express.json());
+app.use(express.json({
+    verify: (req, res, buf) => {
+        req.rawBody = buf;
+    }
+}));
 
 // Set security HTTP headers
 app.use(helmet());

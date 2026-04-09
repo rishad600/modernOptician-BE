@@ -1,4 +1,6 @@
+import mongoose from 'mongoose';
 import courseModel from '../../../../models/course.model.js';
+import Lesson from '../../../../models/lesson.js';
 
 const createCourse = async (courseData) => {
     try {
@@ -17,7 +19,7 @@ const createCourse = async (courseData) => {
 
 const getAllCourses = async () => {
     try {
-        const courses = await courseModel.find();
+        const courses = await courseModel.find({ isTrash: false }).select('-__v -updatedBy -createdBy -createdAt -updatedAt');
         return courses;
     } catch (err) {
         throw err;
@@ -26,8 +28,45 @@ const getAllCourses = async () => {
 
 const getOneCourse = async (id) => {
     try {
-        const course = await courseModel.findById(id);
-        return course;
+        const courses = await courseModel.aggregate([
+            {
+                $match: { _id: new mongoose.Types.ObjectId(id), isTrash: false }
+            },
+            {
+                $lookup: {
+                    from: 'lessons',
+                    localField: '_id',
+                    foreignField: 'courseId',
+                    as: 'lessonsArray'
+                }
+            },
+            {
+                $project: {
+                    __v: 0,
+                    updatedBy: 0,
+                    createdBy: 0,
+                    createdAt: 0,
+                    updatedAt: 0,
+                    lessonsArray: {
+                        $map: {
+                            input: {
+                                $sortArray: { input: "$lessonsArray", sortBy: { order: 1 } }
+                            },
+                            as: "lesson",
+                            in: {
+                                title: "$$lesson.title",
+                                description: "$$lesson.description",
+                                videoStatus: "$$lesson.videoStatus",
+                                duration: "$$lesson.duration",
+                                isFreePreview: "$$lesson.isFreePreview",
+                                isPublished: "$$lesson.isPublished"
+                            }
+                        }
+                    }
+                }
+            }
+        ]);
+        return courses[0] || null;
     } catch (err) {
         throw err;
     }
@@ -64,6 +103,22 @@ const deleteCourse = async (id) => {
         throw err;
     }
 };
+const createLesson = async (lessonData) => {
+    try {
+        const lesson = await Lesson.create(lessonData);
+        return lesson;
+    } catch (err) {
+        throw err;
+    }
+};
+
+const findLessonById = async (id) => {
+    try {
+        return await Lesson.findById(id);
+    } catch (err) {
+        throw err;
+    }
+};
 
 export default {
     createCourse,
@@ -71,4 +126,6 @@ export default {
     getOneCourse,
     updateCourse,
     deleteCourse,
+    createLesson,
+    findLessonById,
 };

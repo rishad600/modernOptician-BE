@@ -2,6 +2,7 @@ import express from 'express';
 import adminRoutes from '../portals/admin/routes.js';
 import userRoutes from '../portals/user/routes.js';
 import publicRoutes from '../portals/public/routes.js';
+import webhookRoutes from './webhook.routes.js';
 
 const router = express.Router();
 
@@ -17,6 +18,10 @@ const defaultRoutes = [
     {
         path: '/public',
         route: publicRoutes,
+    },
+    {
+        path: '/webhooks',
+        route: webhookRoutes,
     },
 ];
 
