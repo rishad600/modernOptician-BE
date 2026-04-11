@@ -41,12 +41,7 @@ const getOneCourse = async (id) => {
                 }
             },
             {
-                $project: {
-                    __v: 0,
-                    updatedBy: 0,
-                    createdBy: 0,
-                    createdAt: 0,
-                    updatedAt: 0,
+                $addFields: {
                     lessonsArray: {
                         $map: {
                             input: {
@@ -54,9 +49,11 @@ const getOneCourse = async (id) => {
                             },
                             as: "lesson",
                             in: {
+                                _id: "$$lesson._id",
                                 title: "$$lesson.title",
                                 description: "$$lesson.description",
                                 videoStatus: "$$lesson.videoStatus",
+                                bunnyVideoId: "$$lesson.bunnyVideoId",
                                 duration: "$$lesson.duration",
                                 isFreePreview: "$$lesson.isFreePreview",
                                 isPublished: "$$lesson.isPublished"
@@ -64,10 +61,20 @@ const getOneCourse = async (id) => {
                         }
                     }
                 }
+            },
+            {
+                $project: {
+                    __v: 0,
+                    updatedBy: 0,
+                    createdBy: 0,
+                    createdAt: 0,
+                    updatedAt: 0,
+                }
             }
         ]);
         return courses[0] || null;
     } catch (err) {
+        console.log(err);
         throw err;
     }
 };
