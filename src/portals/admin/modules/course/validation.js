@@ -41,11 +41,26 @@ const createLesson = Joi.object({
     duration: Joi.number().default(0),
 });
 
-const playVideo = Joi.object({
+const playVideo = {
     params: Joi.object({
         lessonId: Joi.string().required(),
     }),
-});
+};
+
+const deleteVideo = {
+    params: Joi.object({
+        bunnyVideoId: Joi.string().required(),
+    }),
+};
+
+const trashLesson = {
+    params: Joi.object({
+        id: Joi.string().required(),
+    }),
+    body: Joi.object({
+        isTrashed: Joi.boolean().required(),
+    }),
+};
 
 export default {
     createCourse,
@@ -53,4 +68,6 @@ export default {
     prepareVideoUpload,
     createLesson,
     playVideo,
+    deleteVideo,
+    trashLesson,
 };

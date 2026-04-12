@@ -157,6 +157,84 @@ const getSignedPlayUrl = async (lessonId) => {
     }
 };
 
+const deleteVideo = async (bunnyVideoId) => {
+    try {
+        const libraryId = config.bunny.videoLibraryId;
+        const apiKey = config.bunny.apiKey;
+
+        // 1. Delete video from Bunny.net
+        try {
+            await axios.delete(
+                `https://video.bunnycdn.com/library/${libraryId}/videos/${bunnyVideoId}`,
+                {
+                    headers: {
+                        AccessKey: apiKey,
+                        'Content-Type': 'application/json',
+                        accept: 'application/json',
+                    },
+                }
+            );
+        } catch (bunnyError) {
+            console.error('Bunny API Delete Error:', bunnyError.response?.data || bunnyError.message);
+            // If the video is already gone (404), we proceed to clean up our DB.
+            if (bunnyError.response?.status !== 404) {
+                throw new Error(`Bunny.net API Error: ${bunnyError.response?.data?.message || 'Failed to delete video from Bunny.net'}`);
+            }
+        }
+
+        // 2. Update all Lessons associated with this bunnyVideoId
+        const result = await Lesson.updateMany(
+            { bunnyVideoId: bunnyVideoId },
+            {
+                $set: {
+                    bunnyVideoId: null,
+                    videoStatus: null,
+                    videoUrl: null
+                }
+            }
+        );
+
+        return {
+            success: true,
+            modifiedCount: result.modifiedCount
+        };
+    } catch (error) {
+        throw error;
+    }
+};
+
+const trashLesson = async (id, isTrashed) => {
+    try {
+        const lesson = await Lesson.findById(id);
+        if (!lesson) {
+            return {
+                status: 400,
+                message: 'Lesson not found',
+                success: false
+            };
+        }
+
+        if (lesson.isTrashed === isTrashed) {
+            return {
+                status: 400,
+                message: `Lesson is already ${isTrashed ? 'trashed' : 'restored'}`,
+                success: false
+            };
+        }
+
+        lesson.isTrashed = isTrashed;
+        await lesson.save();
+
+        return {
+            status: 200,
+            message: `Lesson ${isTrashed ? 'trashed' : 'restored'} successfully`,
+            success: true
+        };
+    } catch (error) {
+        throw error;
+    }
+};
+
 export default {
     createCourse,
     getAllCourses,
@@ -166,4 +244,6 @@ export default {
     prepareVideoUpload,
     createLesson,
     getSignedPlayUrl,
+    deleteVideo,
+    trashLesson,
 };

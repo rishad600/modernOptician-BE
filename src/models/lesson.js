@@ -22,6 +22,7 @@ const LessonSchema = new Schema(
         order: { type: Number, required: true },
         isFreePreview: { type: Boolean, default: false },
         isPublished: { type: Boolean, default: false },
+        isTrashed: { type: Boolean, default: false },
     },
     { timestamps: true }
 );

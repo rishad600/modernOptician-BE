@@ -96,6 +96,35 @@ const playVideo = async (req, res, next) => {
     }
 };
 
+const deleteVideo = async (req, res, next) => {
+    try {
+        const { bunnyVideoId } = req.params;
+        await courseService.deleteVideo(bunnyVideoId);
+
+        return res.status(200).json(Response.success('Video deleted successfully', null, 200));
+    } catch (error) {
+        console.error('Delete Video error:', error);
+        return res.status(500).json(Response.error(error.message || 'Failed to delete video', 500));
+    }
+};
+
+const trashLesson = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { isTrashed } = req.body;
+        const result = await courseService.trashLesson(id, isTrashed);
+
+        if (result.success === false) {
+            return res.status(result.status).json(Response.error(result.message, result.status));
+        }
+
+        return res.status(200).json(Response.success(result.message, null, 200));
+    } catch (error) {
+        console.error('Trash Lesson error:', error);
+        return res.status(500).json(Response.error(error.message || 'Failed to trash lesson', 500));
+    }
+};
+
 export default {
     create,
     getAll,
@@ -105,4 +134,6 @@ export default {
     prepareVideoUpload,
     addLesson,
     playVideo,
+    deleteVideo,
+    trashLesson,
 };

@@ -2,7 +2,7 @@ import Response from '../utils/response.js';
 
 const validate = (schema) => (req, res, next) => {
     const validSchema = {};
-    const sources = ['query', 'params'];
+    const sources = ['query', 'params', 'body'];
 
     // Check if schema is structured for multi-source validation
     const hasSource = sources.some(key => schema[key]);
