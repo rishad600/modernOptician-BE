@@ -56,7 +56,8 @@ const getOneCourse = async (id) => {
                                 bunnyVideoId: "$$lesson.bunnyVideoId",
                                 duration: "$$lesson.duration",
                                 isFreePreview: "$$lesson.isFreePreview",
-                                isPublished: "$$lesson.isPublished"
+                                isPublished: "$$lesson.isPublished",
+                                isTrashed: "$$lesson.isTrashed"
                             }
                         }
                     }
