@@ -235,6 +235,15 @@ const trashLesson = async (id, isTrashed) => {
     }
 };
 
+const updateLesson = async (id, lessonData) => {
+    try {
+        const lesson = await courseRepository.updateLesson(id, lessonData);
+        return lesson;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export default {
     createCourse,
     getAllCourses,
@@ -246,4 +255,5 @@ export default {
     getSignedPlayUrl,
     deleteVideo,
     trashLesson,
+    updateLesson,
 };

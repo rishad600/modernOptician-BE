@@ -125,6 +125,20 @@ const trashLesson = async (req, res, next) => {
     }
 };
 
+const updateLesson = async (req, res, next) => {
+    try {
+        const updateDTO = courseDto.updateLessonDTO(req.body);
+        const lesson = await courseService.updateLesson(req.params.id, updateDTO);
+        if (!lesson) {
+            return res.status(206).json(Response.error('Your update couldn\'t be completed at this time. Please refresh and try again.', 206));
+        }
+        return res.status(200).json(Response.success('Lesson updated successfully', null, 200));
+    } catch (error) {
+        console.error('Update Lesson error:', error);
+        return res.status(500).json(Response.error(error.message || 'Failed to update lesson', 500));
+    }
+};
+
 export default {
     create,
     getAll,
@@ -136,4 +150,5 @@ export default {
     playVideo,
     deleteVideo,
     trashLesson,
+    updateLesson,
 };

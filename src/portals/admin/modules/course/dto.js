@@ -30,7 +30,19 @@ const updateCourseDTO = (reqBody, adminId) => {
     return dto;
 };
 
+const updateLessonDTO = (reqBody) => {
+    const dto = {};
+    if (reqBody.title !== undefined) dto.title = reqBody.title;
+    if (reqBody.description !== undefined) dto.description = reqBody.description;
+    if (reqBody.duration !== undefined) dto.duration = reqBody.duration;
+    if (reqBody.isFreePreview !== undefined) dto.isFreePreview = reqBody.isFreePreview;
+    if (reqBody.isPublished !== undefined) dto.isPublished = reqBody.isPublished;
+
+    return dto;
+};
+
 export default {
     createCourseDTO,
     updateCourseDTO,
+    updateLessonDTO,
 };

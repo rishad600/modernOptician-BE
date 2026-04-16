@@ -113,6 +113,7 @@ const deleteCourse = async (id) => {
 };
 const createLesson = async (lessonData) => {
     try {
+        lessonData.isPublished = true;
         const lesson = await Lesson.create(lessonData);
         return lesson;
     } catch (err) {
@@ -128,6 +129,18 @@ const findLessonById = async (id) => {
     }
 };
 
+const updateLesson = async (id, lessonData) => {
+    try {
+        const lesson = await Lesson.updateOne({ _id: id }, lessonData);
+        if (lesson.matchedCount === 0) {
+            return false;
+        }
+        return true;
+    } catch (err) {
+        throw err;
+    }
+};
+
 export default {
     createCourse,
     getAllCourses,
@@ -136,4 +149,5 @@ export default {
     deleteCourse,
     createLesson,
     findLessonById,
+    updateLesson,
 };

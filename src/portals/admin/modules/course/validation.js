@@ -62,6 +62,19 @@ const trashLesson = {
     }),
 };
 
+const updateLesson = {
+    params: Joi.object({
+        id: Joi.string().required(),
+    }),
+    body: Joi.object({
+        title: Joi.string().trim().optional(),
+        description: Joi.string().optional(),
+        duration: Joi.number().optional(),
+        isFreePreview: Joi.boolean().optional(),
+        isPublished: Joi.boolean().optional(),
+    }),
+};
+
 export default {
     createCourse,
     updateCourse,
@@ -70,4 +83,5 @@ export default {
     playVideo,
     deleteVideo,
     trashLesson,
+    updateLesson,
 };

@@ -15,6 +15,7 @@ router.get("/play/:lessonId", protect, validate(courseValidation.playVideo), cou
 router.put("/:id", protect, validate(courseValidation.updateCourse), courseController.update);
 router.delete("/delete-video/:bunnyVideoId", protect, validate(courseValidation.deleteVideo), courseController.deleteVideo);
 router.patch("/trash-lesson/:id", protect, validate(courseValidation.trashLesson), courseController.trashLesson);
+router.put("/update-lesson/:id", protect, validate(courseValidation.updateLesson), courseController.updateLesson);
 router.delete("/:id", protect, courseController.deleteCourse);
 
 export default router;
