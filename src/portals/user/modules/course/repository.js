@@ -50,8 +50,7 @@ const findById = async (id, studentId) => {
                                         "$$lesson.bunnyVideoId",
                                         null
                                     ]
-                                },
-                                isTrashed: "$$lesson.isTrashed"
+                                }
                             }
                         }
                     }
