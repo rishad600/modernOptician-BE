@@ -19,6 +19,9 @@ export default {
     apiKey: process.env.BUNNY_API_KEY,
     webhookSecret: process.env.BUNNY_WEBHOOK_SECRET,
     streamTokenKey: process.env.BUNNY_STREAM_TOKEN_KEY,
+    storageZoneName: process.env.BUNNY_STORAGE_ZONE_NAME,
+    storageAccessKey: process.env.BUNNY_STORAGE_ACCESS_KEY,
+    storagePullZoneUrl: process.env.BUNNY_STORAGE_PULL_ZONE_URL,
   },
   timezone: 'Asia/Kolkata',
 };

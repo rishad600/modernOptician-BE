@@ -1,10 +1,17 @@
 import Response from '../../../../utils/response.js';
 import courseService from './service.js';
 import courseDto from './dto.js';
+import bunnyStorage from '../../../../utils/bunnyStorage.js';
+
 
 const create = async (req, res, next) => {
     try {
+        if (req.file) {
+            const imageUrl = await bunnyStorage.uploadFile(req.file.buffer, req.file.originalname, 'courses');
+            req.body.thumbnail = imageUrl;
+        }
         const courseDTO = courseDto.createCourseDTO(req.body, req.admin._id);
+
 
         const course = await courseService.createCourse(courseDTO);
         return res.status(200).json(Response.success('Course created successfully', course, 200));
@@ -33,7 +40,12 @@ const getOne = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
+        if (req.file) {
+            const imageUrl = await bunnyStorage.uploadFile(req.file.buffer, req.file.originalname, 'courses');
+            req.body.thumbnail = imageUrl;
+        }
         const updateDTO = courseDto.updateCourseDTO(req.body, req.admin._id);
+
         const course = await courseService.updateCourse(req.params.id, updateDTO);
         if (!course) {
             return res.status(206).json(Response.error('Your update couldn\'t be completed at this time. Please refresh and try again.', 206));

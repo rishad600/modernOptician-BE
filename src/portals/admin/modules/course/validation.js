@@ -6,7 +6,7 @@ const createCourse = Joi.object({
         'any.required': 'Please add a course name'
     }),
     description: Joi.string().required(),
-    thumbnail: Joi.string().uri().required(),
+    thumbnail: Joi.string().uri().optional(),
     price: Joi.number().min(0).required(),
     category: Joi.string().valid("Optometry", "Retail Management", "Contact Lens", "Dispensing").required(),
     features: Joi.array().items(Joi.string()).default([]).optional(),

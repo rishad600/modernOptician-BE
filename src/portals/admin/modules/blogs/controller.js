@@ -1,9 +1,21 @@
 import Response from '../../../../utils/response.js';
 import blogService from './service.js';
 import blogDto from './dto.js';
+import bunnyStorage from '../../../../utils/bunnyStorage.js';
 
 const create = async (req, res, next) => {
     try {
+        if (req.file) {
+            // Upload to Bunny.net Storage
+            const imageUrl = await bunnyStorage.uploadFile(
+                req.file.buffer,
+                req.file.originalname,
+                'blogs'
+            );
+            // Replace/Set thumbnail URL in body
+            req.body.thumbnail = imageUrl;
+        }
+
         const blogDTO = blogDto.createBlogDTO(req.body, req.admin._id);
 
         const blog = await blogService.createBlog(blogDTO);
@@ -37,6 +49,16 @@ const getOne = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
+        if (req.file) {
+            // Upload new image to Bunny.net Storage
+            const imageUrl = await bunnyStorage.uploadFile(
+                req.file.buffer,
+                req.file.originalname,
+                'blogs'
+            );
+            req.body.thumbnail = imageUrl;
+        }
+
         const updateDTO = blogDto.updateBlogDTO(req.body, req.admin._id);
         const blog = await blogService.updateBlog(req.params.id, updateDTO);
         if (!blog) {
