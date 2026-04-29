@@ -19,16 +19,18 @@ const formatUserList = (users) => {
 };
 
 const formatStudentDetail = (user) => {
+    // Repository now returns `enrollments` (from Enrollment collection), not the
+    // removed User.enrolledCourses embedded array.
     return {
         ...formatUser(user),
-        enrolledCourses: (user.enrolledCourses || []).map(course => ({
-            courseId: course.courseId,
-            courseName: course.courseName || "N/A",
-            amountPaid: course.amountPaid || 0,
-            enrolledAt: course.enrolledAt,
-            paymentStatus: course.paymentStatus || "pending",
-            isCompleted: course.isCompleted || false,
-            completedAt: course.completedAt || null
+        enrolledCourses: (user.enrollments || []).map(e => ({
+            courseId: e.courseId,
+            courseName: e.courseName || "N/A",
+            amountPaid: e.amountPaid || 0,
+            enrolledAt: e.enrolledAt,
+            paymentStatus: e.paymentStatus || "pending",
+            isCompleted: e.isCompleted || false,
+            completedAt: e.completedAt || null,
         }))
     };
 };

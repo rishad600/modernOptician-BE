@@ -21,8 +21,8 @@ const protectAdmin = async (req, res, next) => {
         const decoded = jwt.verify(token, config.jwt.secret);
         const admin = await Admin.findById(decoded.id);
 
-        // Check if admin exists and if the token matches the activeToken
-        if (!admin || admin.activeToken !== token) {
+        // Reject if admin is missing, soft-deleted, or token doesn't match the active session.
+        if (!admin || admin.isTrash || admin.activeToken !== token) {
             return res.status(401).json(Response.error('Not authorized to access this route, invalid or expired session', 401));
         }
 

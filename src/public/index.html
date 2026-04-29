@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optician Online Class — Payment Test Console</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #1e293b;
+            --panel-2: #273449;
+            --border: #334155;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --accent: #0070ba;       /* PayPal blue */
+            --accent-hover: #005ea6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+
+        header {
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 16px;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        header .meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        header input.base-url {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            width: 280px;
+            font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding: 16px 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .panel h2 {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            margin: 0 0 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel h2 .badge {
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 10px;
+            text-transform: none;
+            letter-spacing: 0;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .badge.success { color: var(--success); border-color: rgba(16,185,129,.4); }
+        .badge.error   { color: var(--error);   border-color: rgba(239,68,68,.4); }
+        .badge.warning { color: var(--warning); border-color: rgba(245,158,11,.4); }
+
+        .form-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+        .form-row label {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);
+        }
+        input[type="text"], input[type="email"], input[type="password"], select {
+            width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px;
+            background: var(--bg); color: var(--text); font-size: 13px;
+            font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        }
+        select { font-family: inherit; }
+
+        button {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--panel-2);
+            color: var(--text);
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+            font-weight: 500;
+        }
+        button:hover:not(:disabled) { background: var(--border); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button.primary { background: var(--accent); border-color: var(--accent); color: white; }
+        button.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+        button.danger  { background: transparent; color: var(--error); border-color: rgba(239,68,68,.4); }
+        button.danger:hover:not(:disabled) { background: rgba(239,68,68,.1); }
+        .btn-row { display: flex; gap: 8px; }
+
+        .alert {
+            padding: 10px 12px; border-radius: 4px; margin-bottom: 12px; font-size: 13px;
+            display: flex; gap: 8px; align-items: flex-start;
+        }
+        .alert.error   { background: rgba(239,68,68,.12);  color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
+        .alert.success { background: rgba(16,185,129,.12); color: #6ee7b7; border: 1px solid rgba(16,185,129,.3); }
+        .alert.warning { background: rgba(245,158,11,.12); color: #fcd34d; border: 1px solid rgba(245,158,11,.3); }
+        .alert.info    { background: rgba(59,130,246,.12); color: #93c5fd; border: 1px solid rgba(59,130,246,.3); }
+        .alert .icon { font-weight: 700; }
+
+        .course-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; }
+        .course-card {
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: border-color 0.15s, transform 0.05s;
+        }
+        .course-card:hover { border-color: var(--accent); }
+        .course-card:active { transform: translateY(1px); }
+        .course-card.selected { border-color: var(--accent); background: rgba(0,112,186,.1); }
+        .course-card .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .course-card .name { font-weight: 600; font-size: 14px; }
+        .course-card .meta { font-size: 11px; color: var(--muted); margin-top: 4px; }
+        .course-card .price { font-weight: 600; color: var(--accent); white-space: nowrap; }
+        .course-card .enrolled-tag {
+            background: rgba(16,185,129,.15); color: var(--success);
+            font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: 6px;
+        }
+
+        .selected-summary {
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        .selected-summary .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .selected-summary .row { display: flex; justify-content: space-between; margin-top: 4px; }
+
+        #paypal-button-container { margin-top: 12px; min-height: 50px; }
+
+        .log {
+            font-family: ui-monospace, "SF Mono", Menlo, monospace;
+            font-size: 11px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        .log-entry { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+        .log-entry:last-child { border-bottom: none; }
+        .log-head { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; }
+        .log-method {
+            font-weight: 700; padding: 1px 6px; border-radius: 3px; font-size: 10px;
+            background: var(--panel-2); border: 1px solid var(--border);
+        }
+        .log-status {
+            font-weight: 700; padding: 1px 6px; border-radius: 3px; font-size: 10px;
+        }
+        .log-status.s2xx { color: var(--success); border: 1px solid rgba(16,185,129,.3); }
+        .log-status.s4xx { color: var(--warning); border: 1px solid rgba(245,158,11,.3); }
+        .log-status.s5xx { color: var(--error);   border: 1px solid rgba(239,68,68,.3); }
+        .log-url { color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .log-time { color: var(--muted); font-size: 10px; }
+        .log-body { color: var(--text); white-space: pre-wrap; word-break: break-all; max-height: 120px; overflow-y: auto; }
+
+        .row-flex { display: flex; gap: 8px; align-items: center; }
+        .grow { flex: 1; }
+        .small { font-size: 11px; color: var(--muted); }
+        .copy-btn { font-size: 11px; padding: 4px 8px; }
+
+        details { margin-top: 8px; }
+        details summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+        details[open] summary { color: var(--text); }
+
+        .empty-state { color: var(--muted); font-size: 13px; padding: 12px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Payment Test Console</h1>
+    <div class="meta">
+        <label for="baseUrl" class="small">API:</label>
+        <input id="baseUrl" class="base-url" type="text" placeholder="http://localhost:5000/web">
+        <span id="healthBadge" class="badge">checking…</span>
+    </div>
+</header>
+
+<div class="layout">
+
+    <!-- LEFT COLUMN: auth + courses -->
+    <div>
+        <div class="panel" style="margin-bottom: 16px;">
+            <h2>
+                <span>Authentication</span>
+                <span id="authBadge" class="badge">signed out</span>
+            </h2>
+            <div id="authPanel"></div>
+        </div>
+
+        <div class="panel">
+            <h2>
+                <span>Available Courses</span>
+                <button id="refreshCoursesBtn" class="copy-btn">Refresh</button>
+            </h2>
+            <div id="coursesAlert"></div>
+            <div id="courseList" class="course-list">
+                <div class="empty-state">Sign in and refresh to load courses.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT COLUMN: checkout + log -->
+    <div>
+        <div class="panel" style="margin-bottom: 16px;">
+            <h2>
+                <span>Checkout</span>
+                <span id="checkoutBadge" class="badge">no course selected</span>
+            </h2>
+            <div id="checkoutPanel">
+                <div class="empty-state">Select a course on the left to begin.</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>
+                <span>Activity Log</span>
+                <button id="clearLogBtn" class="copy-btn">Clear</button>
+            </h2>
+            <div id="log" class="log">
+                <div class="empty-state">No requests yet.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// State + persistence
+// ---------------------------------------------------------------------------
+const STORAGE_KEY = 'opticianTestConsole.v1';
+const state = {
+    baseUrl: 'http://localhost:5000/web',
+    token: null,
+    user: null,           // { _id, name, email, ... }
+    courses: [],
+    selectedCourseId: null,
+    enrolledIds: new Set(), // populated heuristically from course list "isEnrolled" or last-checkout result
+    paypalClientId: null,
+    paypalSdkLoaded: false,
+};
+
+const persist = () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        baseUrl: state.baseUrl,
+        token: state.token,
+        user: state.user,
+    }));
+};
+
+const restore = () => {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data.baseUrl) state.baseUrl = data.baseUrl;
+        if (data.token) state.token = data.token;
+        if (data.user) state.user = data.user;
+    } catch { /* ignore */ }
+};
+
+// ---------------------------------------------------------------------------
+// HTTP helper with logging + uniform error handling
+// ---------------------------------------------------------------------------
+async function api(path, { method = 'GET', body, auth = false } = {}) {
+    const url = `${state.baseUrl}${path}`;
+    const headers = { 'Content-Type': 'application/json' };
+    if (auth && state.token) headers['Authorization'] = `Bearer ${state.token}`;
+
+    const startedAt = performance.now();
+    let res, json, text;
+    try {
+        res = await fetch(url, {
+            method,
+            headers,
+            body: body ? JSON.stringify(body) : undefined,
+        });
+        text = await res.text();
+        try { json = JSON.parse(text); } catch { json = { raw: text }; }
+    } catch (networkErr) {
+        logRequest(method, url, 0, `Network error: ${networkErr.message}`, performance.now() - startedAt);
+        throw new ApiError('Network error: server unreachable', 0, null);
+    }
+
+    const elapsed = performance.now() - startedAt;
+    logRequest(method, url, res.status, json, elapsed);
+
+    if (!res.ok) {
+        const message = json?.message || `HTTP ${res.status}`;
+        throw new ApiError(message, res.status, json);
+    }
+    return json;
+}
+
+class ApiError extends Error {
+    constructor(message, status, payload) {
+        super(message);
+        this.status = status;
+        this.payload = payload;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Activity log
+// ---------------------------------------------------------------------------
+function logRequest(method, url, status, body, elapsedMs) {
+    const log = document.getElementById('log');
+    if (log.querySelector('.empty-state')) log.innerHTML = '';
+
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+
+    const statusClass = status === 0 ? 's5xx'
+        : status >= 500 ? 's5xx'
+        : status >= 400 ? 's4xx'
+        : 's2xx';
+
+    const path = url.replace(state.baseUrl, '');
+    const time = new Date().toLocaleTimeString();
+    const bodyText = typeof body === 'string' ? body : JSON.stringify(body, null, 2);
+
+    entry.innerHTML = `
+        <div class="log-head">
+            <span class="log-method">${escapeHtml(method)}</span>
+            <span class="log-status ${statusClass}">${status || 'ERR'}</span>
+            <span class="log-url">${escapeHtml(path)}</span>
+            <span class="log-time">${time} · ${elapsedMs.toFixed(0)}ms</span>
+        </div>
+        <details><summary>response</summary><div class="log-body">${escapeHtml(bodyText)}</div></details>
+    `;
+    log.prepend(entry);
+}
+
+function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+}
+
+// ---------------------------------------------------------------------------
+// Health check
+// ---------------------------------------------------------------------------
+async function refreshHealth() {
+    const badge = document.getElementById('healthBadge');
+    badge.className = 'badge';
+    badge.textContent = 'checking…';
+    try {
+        const url = state.baseUrl.replace(/\/web$/, '') + '/health';
+        const res = await fetch(url);
+        if (res.ok) {
+            badge.className = 'badge success';
+            badge.textContent = 'API online';
+        } else {
+            badge.className = 'badge error';
+            badge.textContent = `API ${res.status}`;
+        }
+    } catch {
+        badge.className = 'badge error';
+        badge.textContent = 'API offline';
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Auth panel
+// ---------------------------------------------------------------------------
+function renderAuthPanel() {
+    const el = document.getElementById('authPanel');
+    const badge = document.getElementById('authBadge');
+
+    if (state.token && state.user) {
+        badge.className = 'badge success';
+        badge.textContent = 'signed in';
+        el.innerHTML = `
+            <div class="selected-summary">
+                <div class="row"><span class="label">Name</span><span>${escapeHtml(state.user.name || '—')}</span></div>
+                <div class="row"><span class="label">Email</span><span>${escapeHtml(state.user.email || '—')}</span></div>
+                <div class="row"><span class="label">User ID</span><span style="font-family: ui-monospace,monospace; font-size:11px;">${escapeHtml(state.user._id || '—')}</span></div>
+            </div>
+            <div class="btn-row">
+                <button id="copyTokenBtn" class="copy-btn">Copy JWT</button>
+                <button id="logoutBtn" class="danger">Sign out</button>
+            </div>
+        `;
+        document.getElementById('logoutBtn').onclick = handleLogout;
+        document.getElementById('copyTokenBtn').onclick = () => {
+            navigator.clipboard.writeText(state.token);
+            showAlert('coursesAlert', 'JWT copied to clipboard', 'info');
+        };
+    } else {
+        badge.className = 'badge';
+        badge.textContent = 'signed out';
+        el.innerHTML = `
+            <div id="authAlert"></div>
+            <div class="form-row">
+                <label for="email">Email</label>
+                <input id="email" type="email" placeholder="student@example.com" autocomplete="email">
+            </div>
+            <div class="form-row">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <div class="btn-row">
+                <button id="loginBtn" class="primary">Sign in</button>
+                <button id="useTokenBtn">Paste JWT instead</button>
+            </div>
+        `;
+        document.getElementById('loginBtn').onclick = handleLogin;
+        document.getElementById('useTokenBtn').onclick = handlePasteToken;
+        const savedEmail = localStorage.getItem(STORAGE_KEY + '.email');
+        if (savedEmail) document.getElementById('email').value = savedEmail;
+    }
+}
+
+async function handleLogin() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if (!email || !password) {
+        showAlert('authAlert', 'Email and password are required', 'error');
+        return;
+    }
+    localStorage.setItem(STORAGE_KEY + '.email', email);
+    setBusy('loginBtn', true);
+    try {
+        const result = await api('/user/profile/login', {
+            method: 'POST',
+            body: { email, password },
+        });
+        // Response shape: { success, message, code, data: { user, token } }
+        const payload = result.data || result;
+        state.token = payload.token;
+        state.user = payload.user;
+        persist();
+        renderAuthPanel();
+        showAlert('coursesAlert', `Welcome back, ${state.user.name || state.user.email}`, 'success');
+        loadCourses();
+    } catch (err) {
+        showAlert('authAlert', err.message, 'error');
+    } finally {
+        setBusy('loginBtn', false);
+    }
+}
+
+function handlePasteToken() {
+    const token = prompt('Paste your JWT:');
+    if (!token) return;
+    state.token = token.trim();
+    state.user = { name: '(pasted token)', email: '', _id: '' };
+    persist();
+    renderAuthPanel();
+    loadCourses();
+}
+
+function handleLogout() {
+    state.token = null;
+    state.user = null;
+    state.courses = [];
+    state.selectedCourseId = null;
+    state.enrolledIds.clear();
+    persist();
+    renderAuthPanel();
+    renderCourses();
+    renderCheckout();
+}
+
+// ---------------------------------------------------------------------------
+// Courses
+// ---------------------------------------------------------------------------
+async function loadCourses() {
+    if (!state.token) {
+        // Public list works without auth.
+    }
+    setBusy('refreshCoursesBtn', true);
+    try {
+        const result = await api('/public/course');
+        // Tolerant of paginated and non-paginated shapes.
+        const payload = result.data ?? result;
+        const list = payload.courses ?? payload.items ?? (Array.isArray(payload) ? payload : []);
+        state.courses = list.map(normalizeCourse);
+        // If the API includes isEnrolled (user/course endpoint), pick it up; public won't.
+        for (const c of state.courses) {
+            if (c.isEnrolled) state.enrolledIds.add(c._id);
+        }
+        renderCourses();
+    } catch (err) {
+        showAlert('coursesAlert', `Failed to load courses: ${err.message}`, 'error');
+    } finally {
+        setBusy('refreshCoursesBtn', false);
+    }
+}
+
+function normalizeCourse(raw) {
+    return {
+        _id: raw._id,
+        name: raw.name || 'Untitled course',
+        category: raw.category || '',
+        price: typeof raw.price === 'number' ? raw.price : Number(raw.price) || 0,
+        currency: raw.currency || 'USD',
+        instructorName: raw.instructorName || '',
+        isEnrolled: !!raw.isEnrolled,
+    };
+}
+
+function renderCourses() {
+    const list = document.getElementById('courseList');
+    if (state.courses.length === 0) {
+        list.innerHTML = '<div class="empty-state">No courses available. Click Refresh to retry.</div>';
+        return;
+    }
+    list.innerHTML = '';
+    for (const c of state.courses) {
+        const isEnrolled = state.enrolledIds.has(c._id);
+        const card = document.createElement('div');
+        card.className = 'course-card' + (state.selectedCourseId === c._id ? ' selected' : '');
+        card.innerHTML = `
+            <div class="row">
+                <div>
+                    <div class="name">
+                        ${escapeHtml(c.name)}
+                        ${isEnrolled ? '<span class="enrolled-tag">enrolled</span>' : ''}
+                    </div>
+                    <div class="meta">${escapeHtml(c.category)} · ${escapeHtml(c.instructorName || '—')}</div>
+                </div>
+                <div class="price">${formatMoney(c.price, c.currency)}</div>
+            </div>
+        `;
+        card.onclick = () => selectCourse(c._id);
+        list.appendChild(card);
+    }
+}
+
+function formatMoney(amount, currency) {
+    try {
+        return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(amount);
+    } catch {
+        return `${amount} ${currency}`;
+    }
+}
+
+function selectCourse(id) {
+    state.selectedCourseId = id;
+    renderCourses();
+    renderCheckout();
+}
+
+// ---------------------------------------------------------------------------
+// Checkout
+// ---------------------------------------------------------------------------
+async function renderCheckout() {
+    const el = document.getElementById('checkoutPanel');
+    const badge = document.getElementById('checkoutBadge');
+
+    if (!state.selectedCourseId) {
+        badge.className = 'badge';
+        badge.textContent = 'no course selected';
+        el.innerHTML = '<div class="empty-state">Select a course on the left to begin.</div>';
+        return;
+    }
+
+    const course = state.courses.find(c => c._id === state.selectedCourseId);
+    if (!course) return;
+
+    const isEnrolled = state.enrolledIds.has(course._id);
+    if (isEnrolled) {
+        badge.className = 'badge success';
+        badge.textContent = 'already enrolled';
+    } else if (!state.token) {
+        badge.className = 'badge warning';
+        badge.textContent = 'sign in to checkout';
+    } else {
+        badge.className = 'badge';
+        badge.textContent = 'ready';
+    }
+
+    el.innerHTML = `
+        <div class="selected-summary">
+            <div class="row"><span class="label">Course</span><span>${escapeHtml(course.name)}</span></div>
+            <div class="row"><span class="label">Category</span><span>${escapeHtml(course.category || '—')}</span></div>
+            <div class="row"><span class="label">Price</span><span>${formatMoney(course.price, course.currency)}</span></div>
+            <div class="row"><span class="label">Course ID</span><span style="font-family:ui-monospace,monospace; font-size:11px;">${escapeHtml(course._id)}</span></div>
+        </div>
+        <div id="checkoutAlert"></div>
+        <div id="paypal-button-container"></div>
+    `;
+
+    if (isEnrolled) {
+        showAlert('checkoutAlert', 'You already have an enrollment for this course. Refunds will revoke access automatically when PayPal sends the webhook.', 'success');
+        return;
+    }
+    if (!state.token) {
+        showAlert('checkoutAlert', 'Sign in to purchase this course.', 'warning');
+        return;
+    }
+
+    await mountPayPalButtons(course);
+}
+
+async function mountPayPalButtons(course) {
+    if (!state.paypalClientId) {
+        try {
+            const cfg = await api('/public/config/paypal');
+            state.paypalClientId = cfg.clientId || cfg.data?.clientId;
+        } catch (err) {
+            showAlert('checkoutAlert', `Failed to fetch PayPal config: ${err.message}`, 'error');
+            return;
+        }
+    }
+    if (!state.paypalSdkLoaded || window.__lastSdkCurrency !== course.currency) {
+        await loadPayPalSdk(course.currency);
+    }
+    if (!window.paypal) {
+        showAlert('checkoutAlert', 'PayPal SDK failed to load.', 'error');
+        return;
+    }
+
+    document.getElementById('paypal-button-container').innerHTML = '';
+    window.paypal.Buttons({
+        createOrder: async () => {
+            try {
+                const result = await api('/user/payment/create-order', {
+                    method: 'POST', auth: true,
+                    body: { courseId: course._id },
+                });
+                const orderId = result.data?.orderId || result.orderId;
+                if (!orderId) throw new ApiError('No orderId in response', 500, result);
+                showAlert('checkoutAlert', `Order created (${orderId}). Complete payment in PayPal.`, 'info');
+                return orderId;
+            } catch (err) {
+                handleCheckoutError(err);
+                throw err;
+            }
+        },
+        onApprove: async (data) => {
+            try {
+                await api('/user/payment/capture-order', {
+                    method: 'POST', auth: true,
+                    body: { orderId: data.orderID },
+                });
+                state.enrolledIds.add(course._id);
+                renderCourses();
+                showAlert('checkoutAlert', 'Payment captured and course enrolled.', 'success');
+                document.getElementById('paypal-button-container').innerHTML = '';
+            } catch (err) {
+                handleCheckoutError(err);
+            }
+        },
+        onCancel: () => {
+            showAlert('checkoutAlert', 'You cancelled the PayPal flow. The order will auto-expire.', 'warning');
+        },
+        onError: (err) => {
+            showAlert('checkoutAlert', `PayPal error: ${err?.message || err}`, 'error');
+        },
+    }).render('#paypal-button-container');
+}
+
+function handleCheckoutError(err) {
+    if (!(err instanceof ApiError)) {
+        showAlert('checkoutAlert', err.message, 'error');
+        return;
+    }
+    // Map our backend's specific status codes to actionable messages.
+    if (err.status === 401) {
+        showAlert('checkoutAlert', 'Your session has expired. Please sign in again.', 'error');
+        handleLogout();
+        return;
+    }
+    if (err.status === 404) {
+        showAlert('checkoutAlert', err.message || 'Course or payment record not found.', 'error');
+        return;
+    }
+    if (err.status === 409) {
+        // Already enrolled — sync local state.
+        state.enrolledIds.add(state.selectedCourseId);
+        renderCourses();
+        renderCheckout();
+        showAlert('checkoutAlert', err.message || 'You are already enrolled in this course.', 'warning');
+        return;
+    }
+    if (err.status === 422) {
+        showAlert('checkoutAlert',
+            `Payment refused: ${err.message}. Backend rejected the capture because the amount or currency did not match the order. Contact support.`,
+            'error');
+        return;
+    }
+    if (err.status === 429) {
+        showAlert('checkoutAlert', 'Rate limit hit. Slow down and retry shortly.', 'warning');
+        return;
+    }
+    showAlert('checkoutAlert', `${err.message} (HTTP ${err.status})`, 'error');
+}
+
+function loadPayPalSdk(currency) {
+    return new Promise((resolve, reject) => {
+        // The SDK can't be re-initialized for a different currency, so if we need to
+        // change it we reload the page would be required. For testing we just
+        // stamp the currency and leave it.
+        const existing = document.querySelector('script[data-paypal-sdk]');
+        if (existing && window.__lastSdkCurrency === currency) {
+            window.__lastSdkCurrency = currency;
+            state.paypalSdkLoaded = true;
+            return resolve();
+        }
+        if (existing) existing.remove();
+        delete window.paypal;
+
+        const script = document.createElement('script');
+        script.dataset.paypalSdk = 'true';
+        script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(state.paypalClientId)}&currency=${encodeURIComponent(currency)}&enable-funding=card,venmo,paylater`;
+        script.onload = () => {
+            window.__lastSdkCurrency = currency;
+            state.paypalSdkLoaded = true;
+            resolve();
+        };
+        script.onerror = () => reject(new Error('Failed to load PayPal SDK'));
+        document.body.appendChild(script);
+    });
+}
+
+// ---------------------------------------------------------------------------
+// UI helpers
+// ---------------------------------------------------------------------------
+function showAlert(containerId, message, type = 'info') {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const icon = { error: '✕', success: '✓', warning: '!', info: 'i' }[type] || 'i';
+    el.innerHTML = `<div class="alert ${type}"><span class="icon">${icon}</span><span>${escapeHtml(message)}</span></div>`;
+}
+
+function setBusy(buttonId, busy) {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+    btn.disabled = busy;
+    btn.dataset.originalText ??= btn.textContent;
+    btn.textContent = busy ? 'Working…' : btn.dataset.originalText;
+}
+
+// ---------------------------------------------------------------------------
+// Boot
+// ---------------------------------------------------------------------------
+restore();
+document.getElementById('baseUrl').value = state.baseUrl;
+document.getElementById('baseUrl').addEventListener('change', (e) => {
+    state.baseUrl = e.target.value.replace(/\/$/, '') || 'http://localhost:5000/web';
+    persist();
+    refreshHealth();
+});
+document.getElementById('refreshCoursesBtn').addEventListener('click', loadCourses);
+document.getElementById('clearLogBtn').addEventListener('click', () => {
+    document.getElementById('log').innerHTML = '<div class="empty-state">No requests yet.</div>';
+});
+
+renderAuthPanel();
+renderCheckout();
+refreshHealth();
+loadCourses();
+</script>
+
+</body>
+</html>

@@ -6,10 +6,10 @@ const { Schema } = mongoose;
 
 const EnrollmentSchema = new Schema(
     {
-        // Now explicitly refs Student, not a generic User
+        // Now explicitly refs User
         studentId: {
             type: Schema.Types.ObjectId,
-            ref: "Student",
+            ref: "User",
             required: true,
         },
         courseId: {
@@ -24,7 +24,7 @@ const EnrollmentSchema = new Schema(
         paymentId: { type: String },
         paymentMethod: {
             type: String,
-            enum: ["Credit Card", "UPI", "Debit Card", "Net Banking", "N/A"],
+            enum: ["Credit Card", "UPI", "Debit Card", "Net Banking", "PayPal", "N/A"],
             default: "N/A",
         },
         paymentStatus: {
@@ -36,6 +36,11 @@ const EnrollmentSchema = new Schema(
         enrolledAt: { type: Date, default: () => moment.tz(config.timezone).toDate() },
         expiresAt: { type: Date, default: null }, // null = lifetime access
 
+        // Course completion is tracked here, on the canonical enrollment row.
+        // (Previously also duplicated on User.enrolledCourses; that has been removed.)
+        isCompleted: { type: Boolean, default: false },
+        completedAt: { type: Date, default: null },
+
         // If admin manually enrolled a student (e.g. free access)
         manuallyEnrolledBy: {
             type: Schema.Types.ObjectId,
@@ -45,5 +50,14 @@ const EnrollmentSchema = new Schema(
     },
     { timestamps: true }
 );
+
+// Idempotency guard: a student can only be enrolled in a given course once.
+// The capture flow + the PayPal webhook both try to create an enrollment;
+// this index makes the second one fail with E11000, which we catch as "already enrolled".
+EnrollmentSchema.index({ studentId: 1, courseId: 1 }, { unique: true });
+
+// Hot-path query indexes used by webhook lookup and admin/dashboard stats.
+EnrollmentSchema.index({ paymentId: 1 });
+EnrollmentSchema.index({ paymentStatus: 1, enrolledAt: -1 });
 
 export default mongoose.model('Enrollment', EnrollmentSchema);

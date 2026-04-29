@@ -30,7 +30,7 @@ const updateProfile = Joi.object({
     name: Joi.string().optional(),
     lastName: Joi.string().optional(),
     phone: Joi.string().optional(),
-});
+}).min(1).messages({ 'object.min': 'At least one field must be provided to update' });
 
 export default {
     register,

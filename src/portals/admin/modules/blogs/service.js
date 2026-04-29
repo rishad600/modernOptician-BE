@@ -1,44 +1,10 @@
 import blogRepository from './repository.js';
 
-const createBlog = async (blogData) => {
-    try {
-        return await blogRepository.createBlog(blogData);
-    } catch (error) {
-        throw error;
-    }
-};
-
-const getAllBlogs = async () => {
-    try {
-        return await blogRepository.getAllBlogs();
-    } catch (error) {
-        throw error;
-    }
-};
-
-const getOneBlog = async (id) => {
-    try {
-        return await blogRepository.getOneBlog(id);
-    } catch (error) {
-        throw error;
-    }
-};
-
-const updateBlog = async (id, blogData) => {
-    try {
-        return await blogRepository.updateBlog(id, blogData);
-    } catch (error) {
-        throw error;
-    }
-};
-
-const deleteBlog = async (id) => {
-    try {
-        return await blogRepository.deleteBlog(id);
-    } catch (error) {
-        throw error;
-    }
-};
+const createBlog = async (blogData) => blogRepository.createBlog(blogData);
+const getAllBlogs = async (paging) => blogRepository.getAllBlogs(paging);
+const getOneBlog = async (id) => blogRepository.getOneBlog(id);
+const updateBlog = async (id, blogData) => blogRepository.updateBlog(id, blogData);
+const deleteBlog = async (id) => blogRepository.deleteBlog(id);
 
 export default {
     createBlog,

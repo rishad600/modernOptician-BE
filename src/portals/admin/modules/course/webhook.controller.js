@@ -1,7 +1,12 @@
 import crypto from 'crypto';
 import config from '../../../../config/config.js';
-import Lesson from '../../../../models/lesson.js';
+import Lesson from '../../../../models/lesson.model.js';
 import Response from '../../../../utils/response.js';
+import {
+    BUNNY_STATUS_LABEL,
+    BUNNY_STATUS_PRIORITY,
+    BUNNY_PLAYABLE_STATUSES,
+} from '../../../../constants/bunny.constants.js';
 
 const handleBunnyWebhook = async (req, res) => {
     try {
@@ -24,40 +29,33 @@ const handleBunnyWebhook = async (req, res) => {
         }
 
         const { VideoLibraryId, VideoGuid, Status } = req.body;
-
-        const statusMap = {
-            0: 'Queued',
-            1: 'Processing',
-            2: 'Encoding',
-            3: 'Finished',
-            4: 'ResolutionFinished',
-            5: 'Failed',
-            6: 'PresignedUploadStarted',
-            7: 'PresignedUploadFinished',
-            8: 'PresignedUploadFailed'
-        };
-
-        const statusString = statusMap[Status] || 'Processing';
+        const statusString = BUNNY_STATUS_LABEL[Status] || 'Processing';
 
         console.log(`Bunny Webhook: Video ${VideoGuid} in Library ${VideoLibraryId} is ${statusString}`);
 
-        // Update Lesson in database
-        const updateData = { videoStatus: statusString };
-
-        // If video is playable, ensure URL is set
-        if (Status === 3 || Status === 4) {
-            updateData.videoUrl = `https://iframe.mediadelivery.net/play/${VideoLibraryId}/${VideoGuid}`;
-        }
-
-        const lesson = await Lesson.findOneAndUpdate(
-            { bunnyVideoId: VideoGuid },
-            updateData,
-            { new: true }
-        );
-
+        const lesson = await Lesson.findOne({ bunnyVideoId: VideoGuid });
         if (!lesson) {
             console.warn(`Webhook Warning: No lesson found for VideoGuid ${VideoGuid}`);
+            return res.status(200).json(Response.success('Webhook acknowledged', null, 200));
         }
+
+        const currentPriority = BUNNY_STATUS_PRIORITY[lesson.videoStatus] ?? 0;
+        const incomingPriority = BUNNY_STATUS_PRIORITY[statusString] ?? 0;
+
+        if (incomingPriority < currentPriority) {
+            console.log(
+                `Ignoring out-of-order webhook for ${VideoGuid}: ${statusString} <= ${lesson.videoStatus}`
+            );
+            return res
+                .status(200)
+                .json(Response.success('Webhook acknowledged (ignored, out of order)', null, 200));
+        }
+
+        lesson.videoStatus = statusString;
+        if (BUNNY_PLAYABLE_STATUSES.has(Status)) {
+            lesson.videoUrl = `https://iframe.mediadelivery.net/play/${VideoLibraryId}/${VideoGuid}`;
+        }
+        await lesson.save();
 
         return res.status(200).json(Response.success('Webhook processed', null, 200));
     } catch (error) {

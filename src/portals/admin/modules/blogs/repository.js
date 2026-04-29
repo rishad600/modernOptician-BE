@@ -1,49 +1,30 @@
 import blogModel from '../../../../models/blog.model.js';
 
-const createBlog = async (blogData) => {
-    try {
-        const blog = await blogModel.create(blogData);
-        return blog;
-    } catch (err) {
-        throw err;
+const createBlog = async (blogData) => blogModel.create(blogData);
+
+const getAllBlogs = async ({ skip = 0, limit = 20, search = '', status = '' } = {}) => {
+    const filter = { isTrash: false };
+    if (status) filter.status = status;
+    if (search) {
+        filter.$or = [
+            { title: { $regex: search, $options: 'i' } },
+            { author: { $regex: search, $options: 'i' } },
+        ];
     }
+    const [items, totalCount] = await Promise.all([
+        blogModel.find(filter).sort({ publishDate: -1 }).skip(skip).limit(limit).lean(),
+        blogModel.countDocuments(filter),
+    ]);
+    return { items, totalCount };
 };
 
-const getAllBlogs = async () => {
-    try {
-        const blogs = await blogModel.find({ isTrash: false });
-        return blogs;
-    } catch (err) {
-        throw err;
-    }
-};
+const getOneBlog = async (id) => blogModel.findOne({ _id: id, isTrash: false });
 
-const getOneBlog = async (id) => {
-    try {
-        const blog = await blogModel.findOne({ _id: id, isTrash: false });
-        return blog;
-    } catch (err) {
-        throw err;
-    }
-};
+const updateBlog = async (id, blogData) =>
+    blogModel.findOneAndUpdate({ _id: id, isTrash: false }, blogData, { new: true });
 
-const updateBlog = async (id, blogData) => {
-    try {
-        const blog = await blogModel.findOneAndUpdate({ _id: id, isTrash: false }, blogData, { new: true });
-        return blog;
-    } catch (err) {
-        throw err;
-    }
-};
-
-const deleteBlog = async (id) => {
-    try {
-        const blog = await blogModel.findByIdAndUpdate(id, { isTrash: true }, { new: true });
-        return blog;
-    } catch (err) {
-        throw err;
-    }
-};
+const deleteBlog = async (id) =>
+    blogModel.findByIdAndUpdate(id, { isTrash: true }, { new: true });
 
 export default {
     createBlog,

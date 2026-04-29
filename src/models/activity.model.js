@@ -22,7 +22,7 @@ const ActivityLogSchema = new Schema(
 
         studentId: {
             type: Schema.Types.ObjectId,
-            ref: "Student",
+            ref: "User",
             default: null,
         },
         adminId: {
@@ -39,5 +39,8 @@ const ActivityLogSchema = new Schema(
     },
     { timestamps: true }
 );
+
+// Dashboard pulls "recent activity" sorted by createdAt desc.
+ActivityLogSchema.index({ createdAt: -1 });
 
 export default mongoose.model('Activity', ActivityLogSchema);

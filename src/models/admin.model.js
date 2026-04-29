@@ -52,11 +52,11 @@ const adminSchema = new Schema(
     }
 );
 
-// Encrypt password using bcrypt
-adminSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) {
-        next();
-    }
+// Encrypt password using bcrypt.
+// Why: previous version called next() without `return` and never called it at the end,
+// which double-hashed the password on every non-password save (e.g. login updating activeToken).
+adminSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
 });

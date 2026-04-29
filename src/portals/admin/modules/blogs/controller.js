@@ -1,87 +1,59 @@
+import asyncHandler from '../../../../utils/asyncHandler.js';
 import Response from '../../../../utils/response.js';
 import blogService from './service.js';
 import blogDto from './dto.js';
 import bunnyStorage from '../../../../utils/bunnyStorage.js';
+import { parsePaging, buildPagedResult } from '../../../../utils/paging.js';
 
-const create = async (req, res, next) => {
-    try {
-        if (req.file) {
-            // Upload to Bunny.net Storage
-            const imageUrl = await bunnyStorage.uploadFile(
-                req.file.buffer,
-                req.file.originalname,
-                'blogs'
-            );
-            // Replace/Set thumbnail URL in body
-            req.body.thumbnail = imageUrl;
-        }
-
-        const blogDTO = blogDto.createBlogDTO(req.body, req.admin._id);
-
-        const blog = await blogService.createBlog(blogDTO);
-        const formattedBlog = blogDto.responseBlogDTO(blog);
-        return res.status(200).json(Response.success('Your article has been successfully saved.', formattedBlog, 200));
-    } catch (error) {
-        return res.status(500).json(Response.error(error.message || 'We encountered an issue while saving your article. Please try again.', 500));
+const create = asyncHandler(async (req, res) => {
+    if (req.file) {
+        req.body.thumbnail = await bunnyStorage.uploadFile(req.file.buffer, req.file.originalname, 'blogs');
     }
-};
+    const blogDTO = blogDto.createBlogDTO(req.body, req.admin._id);
+    const blog = await blogService.createBlog(blogDTO);
+    return res
+        .status(201)
+        .json(Response.success('Your article has been successfully saved.', blogDto.responseBlogDTO(blog), 201));
+});
 
-const getAll = async (req, res, next) => {
-    try {
-        const blogs = await blogService.getAllBlogs();
-        return res.status(200).json(Response.success('Blogs fetched successfully', blogs, 200));
-    } catch (error) {
-        return res.status(500).json(Response.error(error.message || 'Failed to fetch blogs', 500));
+const getAll = asyncHandler(async (req, res) => {
+    const { page, limit, skip } = parsePaging(req.query);
+    const { search = '', status = '' } = req.query;
+    const { items, totalCount } = await blogService.getAllBlogs({ skip, limit, search, status });
+    return res
+        .status(200)
+        .json(Response.success('Blogs fetched successfully', buildPagedResult(items, totalCount, page, limit, 'blogs'), 200));
+});
+
+const getOne = asyncHandler(async (req, res) => {
+    const blog = await blogService.getOneBlog(req.params.id);
+    if (!blog) {
+        return res.status(404).json(Response.error('Blog not found', 404));
     }
-};
+    return res.status(200).json(Response.success('Blog fetched successfully', blog, 200));
+});
 
-const getOne = async (req, res, next) => {
-    try {
-        const blog = await blogService.getOneBlog(req.params.id);
-        if (!blog) {
-            return res.status(404).json(Response.error('Blog not found', 404));
-        }
-        return res.status(200).json(Response.success('Blog fetched successfully', blog, 200));
-    } catch (error) {
-        return res.status(500).json(Response.error(error.message || 'Failed to fetch blog', 500));
+const update = asyncHandler(async (req, res) => {
+    if (req.file) {
+        req.body.thumbnail = await bunnyStorage.uploadFile(req.file.buffer, req.file.originalname, 'blogs');
     }
-};
-
-const update = async (req, res, next) => {
-    try {
-        if (req.file) {
-            // Upload new image to Bunny.net Storage
-            const imageUrl = await bunnyStorage.uploadFile(
-                req.file.buffer,
-                req.file.originalname,
-                'blogs'
-            );
-            req.body.thumbnail = imageUrl;
-        }
-
-        const updateDTO = blogDto.updateBlogDTO(req.body, req.admin._id);
-        const blog = await blogService.updateBlog(req.params.id, updateDTO);
-        if (!blog) {
-            return res.status(404).json(Response.error('The requested article could not be found.', 404));
-        }
-        const formattedBlog = blogDto.responseBlogDTO(blog);
-        return res.status(200).json(Response.success('Your article has been successfully updated.', formattedBlog, 200));
-    } catch (error) {
-        return res.status(500).json(Response.error(error.message || 'We encountered an issue while updating your article. Please try again.', 500));
+    const updateDTO = blogDto.updateBlogDTO(req.body, req.admin._id);
+    const blog = await blogService.updateBlog(req.params.id, updateDTO);
+    if (!blog) {
+        return res.status(404).json(Response.error('The requested article could not be found.', 404));
     }
-};
+    return res
+        .status(200)
+        .json(Response.success('Your article has been successfully updated.', blogDto.responseBlogDTO(blog), 200));
+});
 
-const deleteBlog = async (req, res, next) => {
-    try {
-        const blog = await blogService.deleteBlog(req.params.id);
-        if (!blog) {
-            return res.status(404).json(Response.error('Blog not found', 404));
-        }
-        return res.status(200).json(Response.success('Blog deleted successfully', blog, 200));
-    } catch (error) {
-        return res.status(500).json(Response.error(error.message || 'Failed to delete blog', 500));
+const deleteBlog = asyncHandler(async (req, res) => {
+    const blog = await blogService.deleteBlog(req.params.id);
+    if (!blog) {
+        return res.status(404).json(Response.error('Blog not found', 404));
     }
-};
+    return res.status(200).json(Response.success('Blog deleted successfully', blog, 200));
+});
 
 export default {
     create,

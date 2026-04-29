@@ -21,8 +21,8 @@ const protect = async (req, res, next) => {
         const decoded = jwt.verify(token, config.jwt.secret);
         const user = await User.findById(decoded.id);
 
-        // Check if user exists and if the token matches the activeToken
-        if (!user || user.activeToken !== token) {
+        // Reject if user is missing, soft-deleted, deactivated, or token doesn't match the active session.
+        if (!user || user.isTrash || !user.isActive || user.activeToken !== token) {
             return res.status(401).json(Response.error('Not authorized to access this route, invalid or expired session', 401));
         }
 
