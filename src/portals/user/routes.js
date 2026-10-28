@@ -1,6 +1,7 @@
 import express from 'express';
 import profileRoutes from './modules/profile/routes.js';
 import courseRoutes from './modules/course/routes.js';
+import paymentRoutes from './modules/payment/routes.js';
 import protect from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
@@ -10,5 +11,6 @@ router.use('/profile', profileRoutes);
 
 // Protected user routes
 router.use('/course', protect, courseRoutes);
+router.use('/payment', protect, paymentRoutes);
 
 export default router;

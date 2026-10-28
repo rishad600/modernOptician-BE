@@ -4,9 +4,13 @@ import Response from '../utils/response.js';
 // Use memory storage to avoid writing files to disk before uploading to Bunny
 const storage = multer.memoryStorage();
 
+// Filename extension is trivially spoofable, so we also check the MIME type the client
+// declared. For higher trust, validate magic bytes post-upload with the `file-type` lib.
+const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const ALLOWED_EXT = /\.(jpg|jpeg|png|webp)$/i;
+
 const fileFilter = (req, file, cb) => {
-  // Accept images only
-  if (!file.originalname.match(/\.(jpg|jpeg|png|webp)$/)) {
+  if (!ALLOWED_EXT.test(file.originalname) || !ALLOWED_MIME.has(file.mimetype)) {
     return cb(new Error('Only image files (jpg, jpeg, png, webp) are allowed!'), false);
   }
   cb(null, true);

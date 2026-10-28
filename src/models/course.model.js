@@ -40,4 +40,8 @@ const courseSchema = new Schema(
     }
 );
 
+// Every list/detail query filters on isTrash + status; admin list also sorts by createdAt.
+courseSchema.index({ isTrash: 1, status: 1, createdAt: -1 });
+courseSchema.index({ category: 1, isTrash: 1 });
+
 export default mongoose.model('Course', courseSchema);

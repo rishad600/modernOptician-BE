@@ -6,17 +6,12 @@ const ProgressSchema = new Schema(
     {
         studentId: {
             type: Schema.Types.ObjectId,
-            ref: "Student",
+            ref: "User",
             required: true,
         },
         courseId: {
             type: Schema.Types.ObjectId,
             ref: "Course",
-            required: true,
-        },
-        chapterId: {
-            type: Schema.Types.ObjectId,
-            ref: "Chapter",
             required: true,
         },
         lessonId: {
@@ -33,5 +28,9 @@ const ProgressSchema = new Schema(
     },
     { timestamps: true }
 );
+
+// Resume-playback / completion lookups always go (studentId, courseId, lessonId).
+ProgressSchema.index({ studentId: 1, lessonId: 1 }, { unique: true });
+ProgressSchema.index({ studentId: 1, courseId: 1 });
 
 export default mongoose.model('Progress', ProgressSchema);

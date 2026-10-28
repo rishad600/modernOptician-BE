@@ -29,8 +29,8 @@ const changePassword = asyncHandler(async (req, res, next) => {
 });
 
 const forgotPassword = asyncHandler(async (req, res, next) => {
-    await userService.forgotPassword(req.body.email);
-    res.json(Response.success('OTP sent to email'));
+    const result = await userService.forgotPassword(req.body.email);
+    res.json(Response.success(result.message));
 });
 
 const resetPassword = asyncHandler(async (req, res, next) => {

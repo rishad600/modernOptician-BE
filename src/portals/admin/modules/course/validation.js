@@ -25,7 +25,7 @@ const updateCourse = Joi.object({
     instructorName: Joi.string().optional(),
     status: Joi.string().valid('Published', 'Draft', 'Archived').optional()
     // updatedBy will be assigned via token/auth, not user input
-});
+}).min(1).messages({ 'object.min': 'At least one field must be provided to update' });
 
 const prepareVideoUpload = Joi.object({
     courseId: Joi.string().required(),
@@ -58,7 +58,7 @@ const trashLesson = {
         id: Joi.string().required(),
     }),
     body: Joi.object({
-        isTrashed: Joi.boolean().required(),
+        isTrash: Joi.boolean().required(),
     }),
 };
 
@@ -72,7 +72,7 @@ const updateLesson = {
         duration: Joi.number().optional(),
         isFreePreview: Joi.boolean().optional(),
         isPublished: Joi.boolean().optional(),
-    }),
+    }).min(1).messages({ 'object.min': 'At least one field must be provided to update' }),
 };
 
 export default {

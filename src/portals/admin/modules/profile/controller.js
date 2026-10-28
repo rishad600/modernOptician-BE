@@ -3,8 +3,10 @@ import asyncHandler from '../../../../utils/asyncHandler.js';
 import Response from '../../../../utils/response.js';
 
 const register = asyncHandler(async (req, res, next) => {
-    const { admin, token } = await adminService.register(req.body);
-    res.status(201).json(Response.success('Successfully created', { admin, token }, 201));
+    // createdBy comes from the authenticated super-admin — never trust the body for it.
+    const adminData = { ...req.body, createdBy: req.admin._id };
+    const { admin } = await adminService.register(adminData);
+    res.status(201).json(Response.success('Admin created', { admin }, 201));
 });
 
 const login = asyncHandler(async (req, res, next) => {

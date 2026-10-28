@@ -30,7 +30,7 @@ const updateBlog = Joi.object({
     publishDate: Joi.string().allow(null, '').optional(),
     aboutAuthor: Joi.string().allow('').optional(),
     status: Joi.string().valid('Published', 'Draft').optional(),
-});
+}).min(1).messages({ 'object.min': 'At least one field must be provided to update' });
 
 export default {
     createBlog,

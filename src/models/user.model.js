@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import moment from 'moment-timezone';
-import config from '../config/config.js';
 
 const { Schema } = mongoose;
 
@@ -60,25 +58,22 @@ const userSchema = new Schema(
         },
         avatar: { type: String, default: null },
         isActive: { type: Boolean, default: true },
-        enrolledCourses: [
-            {
-                courseId: { type: Schema.Types.ObjectId, ref: "Course" },
-                enrolledAt: { type: Date, default: () => moment.tz(config.timezone).toDate() },
-                isCompleted: { type: Boolean, default: false },
-                completedAt: { type: Date, default: null }
-            },
-        ],
+        // enrolledCourses removed: the Enrollment collection is now the single source of truth.
+        // To list a user's courses: Enrollment.find({ studentId, paymentStatus: 'completed' }).
     },
     {
         timestamps: true, // Includes createdAt and updatedAt
     }
 );
 
-// Encrypt password using bcrypt
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) {
-        next();
-    }
+// Admin student list filters on isTrash and sorts by createdAt; dashboard uses both.
+userSchema.index({ isTrash: 1, createdAt: -1 });
+
+// Encrypt password using bcrypt.
+// Why: previous version called next() without `return` and never called it at the end,
+// which double-hashed the password on every non-password save (e.g. login updating activeToken).
+userSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
 });

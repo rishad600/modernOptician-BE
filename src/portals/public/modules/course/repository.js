@@ -1,15 +1,31 @@
 import mongoose from 'mongoose';
 import Course from '../../../../models/course.model.js';
 
-const findAllPublished = async () => {
-    return await Course.find({ isTrash: false, status: 'Published' })
-        .select('-__v -updatedBy -createdBy -createdAt -updatedAt')
-        .lean();
+const findAllPublished = async ({ skip = 0, limit = 20, search = '', category = '' } = {}) => {
+    const filter = { isTrash: false, status: 'Published' };
+    if (category) filter.category = category;
+    if (search) {
+        filter.$or = [
+            { name: { $regex: search, $options: 'i' } },
+            { instructorName: { $regex: search, $options: 'i' } },
+        ];
+    }
+
+    const [items, totalCount] = await Promise.all([
+        Course.find(filter)
+            .select('-__v -updatedBy -createdBy -createdAt -updatedAt')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+        Course.countDocuments(filter),
+    ]);
+
+    return { items, totalCount };
 };
 
 const getOneCourse = async (id) => {
-    try {
-        const courses = await Course.aggregate([
+    const courses = await Course.aggregate([
             {
                 $match: {
                     _id: new mongoose.Types.ObjectId(id),
@@ -42,7 +58,7 @@ const getOneCourse = async (id) => {
                                 duration: "$$lesson.duration",
                                 isFreePreview: "$$lesson.isFreePreview",
                                 isPublished: "$$lesson.isPublished",
-                                isTrashed: "$$lesson.isTrashed"
+                                isTrash: "$$lesson.isTrash"
                             }
                         }
                     }
@@ -57,12 +73,8 @@ const getOneCourse = async (id) => {
                     updatedAt: 0,
                 }
             }
-        ]);
-        return courses[0] || null;
-    } catch (err) {
-        console.log(err);
-        throw err;
-    }
+    ]);
+    return courses[0] || null;
 };
 
 export default {

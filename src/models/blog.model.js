@@ -72,4 +72,6 @@ const blogSchema = new Schema(
     }
 );
 
+blogSchema.index({ isTrash: 1, status: 1, publishDate: -1 });
+
 export default mongoose.model('Blog', blogSchema);
